@@ -55,6 +55,12 @@ class CenterOfMass:
 
         self.__buffers = Buffers(num_images, num_rois)
 
+        self.__range = cupy.arange(self.__roi_size, dtype=cupy.int32)
+
+        self.__offset_y, self.__offset_x = cupy.meshgrid(
+            cupy.arange(self.__roi_size), cupy.arange(self.__roi_size), indexing="ij"
+        )  # (K, K)
+
     def __calculate_averages(
         self,
         images: cupy.ndarray,
@@ -91,6 +97,88 @@ class CenterOfMass:
         )
 
         return (self.__buffers.averages_buffer, self.__buffers.std_buffer)
+
+    # def __calculate_averages(
+    #     self,
+    #     images: cupy.ndarray,
+    #     roi_coordinates: cupy.ndarray,
+    # ) -> cupy.ndarray:
+    #     assert roi_coordinates.dtype == cupy.uint32
+    #
+    #     Y = roi_coordinates[:, 0, None, None] + self.__range
+    #     X = roi_coordinates[:, 1, None, None] + self.__range
+    #
+    #     num_images = images.shape[0]
+    #     rois = images[:, Y, X]
+    #     num_rois = roi_coordinates.shape[0]
+    #     cupy.mean(
+    #         rois.reshape((num_images, num_rois, -1)),
+    #         axis=2,
+    #         out=self.__buffers.averages_buffer,
+    #     )
+    #     cupy.std(
+    #         rois.reshape((num_images, num_rois, -1)),
+    #         axis=2,
+    #         out=self.__buffers.std_buffer,
+    #     )
+    #
+    #     return (self.__buffers.averages_buffer, self.__buffers.std_buffer)
+
+    # def calculate_yx(
+    #     self, images: cupy.ndarray, roi_coordinates: cupy.ndarray
+    # ) -> cupy.ndarray:
+    #     (averages, stds) = self.__calculate_averages(images, roi_coordinates)
+    #     N, H, W = images.shape
+    #     R = roi_coordinates.shape[0]
+    #     K = self.__roi_size
+    #
+    #     # Create a grid of offsets for ROI block (KxK)
+    #     # offset_y, offset_x = cupy.meshgrid(
+    #     #     cupy.arange(K), cupy.arange(K), indexing="ij"
+    #     # )  # (K, K)
+    #
+    #     # Compute absolute ROI positions for each ROI
+    #     roi_x = roi_coordinates[:, 0]  # (R,)
+    #     roi_y = roi_coordinates[:, 1]  # (R,)
+    #     roi_grid_x = roi_x[:, None, None] + self.__offset_x  # (R, K, K)
+    #     roi_grid_y = roi_y[:, None, None] + self.__offset_y  # (R, K, K)
+    #
+    #     # Expand across images: get (N, R, K, K) indices
+    #     roi_grid_x = cupy.broadcast_to(roi_grid_x, (N, R, K, K))
+    #     roi_grid_y = cupy.broadcast_to(roi_grid_y, (N, R, K, K))
+    #
+    #     # Gather pixel values using fancy indexing
+    #     images_flat = images[:, None]  # (N, 1, H, W)
+    #     pixel_values = images_flat[
+    #         cupy.arange(N)[:, None, None, None],
+    #         cupy.zeros(
+    #             (N, R, K, K), dtype=int
+    #         ),  # singleton index for dimension alignment
+    #         roi_grid_y,
+    #         roi_grid_x,
+    #     ]  # shape: (N, R, K, K)
+    #
+    #     # Compute II values
+    #     roi_avg = averages[:, :, None, None]  # (N, R, 1, 1)
+    #     roi_std = stds[:, :, None, None]  # (N, R, 1, 1)
+    #
+    #     II = cupy.maximum(
+    #         0.0, cupy.abs(pixel_values.astype(cupy.float32) - roi_avg) - roi_std
+    #     )  # (N, R, K, K)
+    #
+    #     # Center of mass
+    #     y_coords = self.__offset_y[None, None, :, :]  # (1, 1, K, K)
+    #     x_coords = self.__offset_x[None, None, :, :]  # (1, 1, K, K)
+    #
+    #     total_II = II.sum(axis=(2, 3))  # (N, R)
+    #     total_y_II = (II * y_coords).sum(axis=(2, 3))  # (N, R)
+    #     total_x_II = (II * x_coords).sum(axis=(2, 3))  # (N, R)
+    #
+    #     center_y = total_y_II / (total_II) + roi_y[None, :]  # (N, R)
+    #     center_x = total_x_II / (total_II) + roi_x[None, :]  # (N, R)
+    #
+    #     center_of_mass = cupy.stack((center_y, center_x), axis=-1)  # (N, R, 2)
+    #     return center_of_mass.astype(cupy.float32), averages
 
     def calculate_yx(
         self, images: cupy.ndarray, roi_coordinates: cupy.ndarray

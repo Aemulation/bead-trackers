@@ -366,9 +366,15 @@ def plot_z_values(z_values: cupy.ndarray, traces: cupy.ndarray):
     plt.show()
 
 
-def make_roi_coordinates(num_rois: int, height: int, width: int) -> cupy.ndarray:
-    random_y = cupy.random.randint(0, height - ROI_SIZE, num_rois, dtype=cupy.uint32)
-    random_x = cupy.random.randint(0, width - ROI_SIZE, num_rois, dtype=cupy.uint32)
+def make_roi_coordinates(
+    num_rois: int, image_height: int, image_width: int, roi_size: int
+) -> cupy.ndarray:
+    random_y = cupy.random.randint(
+        0, image_height - roi_size, num_rois, dtype=cupy.uint32
+    )
+    random_x = cupy.random.randint(
+        0, image_width - roi_size, num_rois, dtype=cupy.uint32
+    )
 
     return cupy.sort(cupy.column_stack((random_y, random_x)))
 
@@ -380,7 +386,7 @@ def test_tracker_time(
 
     num_rois = 40
     height, width = camera_image.shape
-    roi_coordinates = make_roi_coordinates(num_rois, height, width)
+    roi_coordinates = make_roi_coordinates(num_rois, height, width, ROI_SIZE)
 
     num_z_values = 100
     zstacks = cupy.zeros(
