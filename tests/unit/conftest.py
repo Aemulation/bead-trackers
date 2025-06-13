@@ -68,3 +68,16 @@ def mock_z_lookup_table():
 @pytest.fixture
 def mock_z_values():
     return cupy.linspace(100, 1100, NUM_Z_LAYERS, dtype=cupy.float32)
+
+
+def make_roi_coordinates(
+    num_rois: int, image_height: int, image_width: int, roi_size: int
+) -> cupy.ndarray:
+    random_y = cupy.random.randint(
+        0, image_height - roi_size, num_rois, dtype=cupy.uint32
+    )
+    random_x = cupy.random.randint(
+        0, image_width - roi_size, num_rois, dtype=cupy.uint32
+    )
+
+    return cupy.sort(cupy.column_stack((random_y, random_x)))

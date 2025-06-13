@@ -1,6 +1,8 @@
 import cupy
+import numpy as np
 
 from src.trackers.bead_tracker.center_of_mass import CenterOfMass
+from tests.unit.conftest import make_roi_coordinates
 
 
 def test_calculate_yx_full_image(rings: cupy.ndarray):
@@ -80,3 +82,48 @@ def test_calculate_yx_full_image_real_nested(roi_image: cupy.ndarray):
         expected_yx = [22.1, 23.5]
         assert cupy.isclose(center_of_mass_y, expected_yx[0], atol=0.2 * image_height)
         assert cupy.isclose(center_of_mass_x, expected_yx[1], atol=0.2 * image_width)
+
+
+def test_speed(rings: cupy.ndarray):
+    image_height = 2016
+    image_width = 2560
+    roi_size = 100
+    num_images = 10
+    num_rois = 10
+    images = cupy.zeros((num_images, image_height, image_width), dtype=cupy.uint16)
+    roi_coordinates = make_roi_coordinates(
+        num_rois, image_height, image_width, roi_size
+    )
+
+    mock_center_of_mass = CenterOfMass(num_images, num_rois, roi_size)
+
+    s2 = cupy.cuda.Stream()
+
+    # Warmup
+    for _ in range(10):
+        (center_of_masses, averages) = mock_center_of_mass.calculate_yx(
+            images, roi_coordinates
+        )
+
+    total_elapsed = []
+    num_iters = 10
+
+    for _ in range(num_iters):
+        e1 = cupy.cuda.Event()
+        e1.record()
+        e2 = cupy.cuda.get_current_stream().record()
+
+        s2.wait_event(e2)
+        with s2:
+            (center_of_masses, averages) = mock_center_of_mass.calculate_yx(
+                images, roi_coordinates
+            )
+
+        e2.synchronize()
+        t = cupy.cuda.get_elapsed_time(e1, e2)
+        total_elapsed.append(t)
+        print(f"ELAPSED: {t}ms")
+
+    total_elapsed = np.array(total_elapsed)
+    print(f"Avg: {np.mean(total_elapsed)}")
+    print(f"Std: {np.std(total_elapsed)}")
