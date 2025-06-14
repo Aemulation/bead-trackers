@@ -72,7 +72,13 @@ class Tracker(TrackerProtocol):
         )
 
         lookup_table_profiles = self.create_lookup_table_profiles(
-            lookup_table_images, radial_profiler_config
+            lookup_table_images,
+            radial_profiler_config,
+            min_qi_radius,
+            max_qi_radius,
+            number_of_qi_radial_steps,
+            number_of_qi_angle_steps,
+            number_of_qi_iterations,
         )
         num_layers = lookup_table_profiles.shape[1]
         z_values = cupy.linspace(
@@ -95,6 +101,11 @@ class Tracker(TrackerProtocol):
         self,
         lookup_table_images: cupy.ndarray,
         radial_profiler_config: RadialProfilerConfig,
+        min_qi_radius: float,
+        max_qi_radius: float,
+        number_of_qi_radial_steps: int,
+        number_of_qi_angle_steps: int,
+        number_of_qi_iterations: int,
     ) -> cupy.ndarray:
         z_lookup_tables = []
         for image in lookup_table_images:
@@ -107,12 +118,21 @@ class Tracker(TrackerProtocol):
             num_beads = roi_coordinates.shape[0]
 
             center_of_mass = CenterOfMass(num_images, num_beads, image_height)
+            qi_tracker = QuadrantInterpolationTracker(
+                num_images,
+                roi_coordinates,
+                image_height,
+                min_qi_radius,
+                max_qi_radius,
+                number_of_qi_radial_steps,
+                number_of_qi_angle_steps,
+            )
 
             (bead_coordinates, averages) = center_of_mass.calculate_yx(
                 images, roi_coordinates
             )
-            for _ in range(3):
-                bead_coordinates = self.__quadrant_interpolation_tracker.calculate_yx(
+            for _ in range(number_of_qi_iterations):
+                bead_coordinates = qi_tracker.calculate_yx(
                     images, bead_coordinates, averages
                 )
 
