@@ -3,6 +3,8 @@ import numpy as np
 import pytest
 import json
 
+import pathlib
+
 from src.trackers.bead_tracker.quadrant_interpolation_tracker import (
     QuadrantInterpolationTracker,
 )
@@ -451,6 +453,8 @@ def test_tracker_measure_buffer_size(
     number_of_qi_angle_steps = 100
     number_of_qi_radial_steps = ROI_SIZE // 4
     number_of_qi_iterations = 3
+
+    pathlib.Path("test-results/buffer-sizes").mkdir(parents=True, exist_ok=True)
 
     for num_rois in num_roises:
         data = {}
