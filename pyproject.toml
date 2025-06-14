@@ -4,18 +4,11 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = [
-    "cupy",
-    "numpy>=2.3.0",
-    "pytest>=8.4.0",
-]
+dependencies = ["cameras", "cupy", "numpy>=2.3.0", "pytest>=8.4.0"]
 
 [tool.uv.sources]
 cupy = { path = "../cupy" }
+cameras = { git = "https://github.com/Aemulation/cameras.git", subdirectory = "python" }
 
 [dependency-groups]
-dev = [
-    "matplotlib>=3.10.3",
-    "pyqt6>=6.9.1",
-    "tk>=0.1.0",
-]
+dev = ["matplotlib>=3.10.3", "pyqt6>=6.9.1", "tk>=0.1.0"]

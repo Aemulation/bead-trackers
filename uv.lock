@@ -7,6 +7,7 @@ name = "bead-trackers"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "cameras" },
     { name = "cupy" },
     { name = "numpy" },
     { name = "pytest" },
@@ -21,6 +22,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "cameras", git = "https://github.com/Aemulation/cameras.git?subdirectory=python" },
     { name = "cupy", directory = "../cupy" },
     { name = "numpy", specifier = ">=2.3.0" },
     { name = "pytest", specifier = ">=8.4.0" },
@@ -31,6 +33,14 @@ dev = [
     { name = "matplotlib", specifier = ">=3.10.3" },
     { name = "pyqt6", specifier = ">=6.9.1" },
     { name = "tk", specifier = ">=0.1.0" },
+]
+
+[[package]]
+name = "cameras"
+version = "1.0.0"
+source = { git = "https://github.com/Aemulation/cameras.git?subdirectory=python#95acbecfb3fc4238805e7f32bdc279cf00f5f9c4" }
+dependencies = [
+    { name = "numpy" },
 ]
 
 [[package]]
