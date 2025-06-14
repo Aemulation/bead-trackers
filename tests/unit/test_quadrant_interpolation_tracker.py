@@ -30,7 +30,13 @@ def test_quadrant_interpolation_tracker(rings: cupy.ndarray):
     )
 
     quadrant_interpolation_tracker = QuadrantInterpolationTracker(
-        num_images, roi_coordinates, image_height
+        num_images,
+        roi_coordinates,
+        image_height,
+        1,
+        image_height // 4,
+        image_width // 4,
+        100,
     )
 
     averages = cupy.expand_dims(cupy.average(rings), axis=0)
@@ -73,7 +79,13 @@ def test_quadrant_interpolation_tracker_nested(rings: cupy.ndarray):
     )
 
     quadrant_interpolation_tracker = QuadrantInterpolationTracker(
-        num_images, roi_coordinates, image_height
+        num_images,
+        roi_coordinates,
+        image_height,
+        1,
+        image_height // 4,
+        image_width // 4,
+        100,
     )
 
     averages = cupy.expand_dims(cupy.average(rings), axis=0)
@@ -123,7 +135,13 @@ def test_quadrant_interpolation_tracker_real(
         axis=0,
     )
     quadrant_interpolation_tracker = QuadrantInterpolationTracker(
-        num_images, roi_coordinates, image_height
+        num_images,
+        roi_coordinates,
+        image_height,
+        1,
+        image_height // 4,
+        image_width // 4,
+        100,
     )
 
     averages = cupy.expand_dims(cupy.average(roi_image), axis=0)

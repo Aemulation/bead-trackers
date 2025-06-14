@@ -28,6 +28,10 @@ class Tracker(TrackerProtocol):
         number_of_qi_radial_steps: int,
         number_of_qi_angle_steps: int,
         number_of_qi_iterations: int,
+        min_lut_radius: float,
+        max_lut_radius: float,
+        number_of_lut_radial_steps: int,
+        number_of_lut_angle_steps: int,
         *args,
         **kwargs,
     ) -> None:
@@ -47,11 +51,20 @@ class Tracker(TrackerProtocol):
         )
 
         self.__quadrant_interpolation_tracker = QuadrantInterpolationTracker(
-            num_images_per_buffer, roi_coordinates, roi_size
+            num_images_per_buffer,
+            roi_coordinates,
+            roi_size,
+            min_qi_radius,
+            max_qi_radius,
+            number_of_qi_radial_steps,
+            number_of_qi_angle_steps,
         )
 
         radial_profiler_config = RadialProfilerConfig(
-            1, roi_size / 4, roi_size // 4, 100
+            min_lut_radius,
+            max_lut_radius,
+            number_of_lut_radial_steps,
+            number_of_lut_angle_steps,
         )
 
         self.__radial_profiler = RadialProfiler(
@@ -94,15 +107,12 @@ class Tracker(TrackerProtocol):
             num_beads = roi_coordinates.shape[0]
 
             center_of_mass = CenterOfMass(num_images, num_beads, image_height)
-            qi_tracker = QuadrantInterpolationTracker(
-                num_images, roi_coordinates, image_height
-            )
 
             (bead_coordinates, averages) = center_of_mass.calculate_yx(
                 images, roi_coordinates
             )
             for _ in range(3):
-                bead_coordinates = qi_tracker.calculate_yx(
+                bead_coordinates = self.__quadrant_interpolation_tracker.calculate_yx(
                     images, bead_coordinates, averages
                 )
 

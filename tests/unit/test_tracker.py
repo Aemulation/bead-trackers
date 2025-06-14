@@ -32,12 +32,12 @@ REFERENCE_BEAD_ID = 96
 Z_CORRECTION = 0.88
 
 
-DATA_DIRECTORY = (
-    "/home/markhonkoop/thesis/RNA67_hairpin_force_extension_save_ROI_tracker"
-)
 # DATA_DIRECTORY = (
-#     "C:/data/Misha/20250520/exp1/RNA67_hairpin_force_extension_save_ROI_tracker"
+#     "/home/markhonkoop/thesis/RNA67_hairpin_force_extension_save_ROI_tracker"
 # )
+DATA_DIRECTORY = (
+    "C:/data/Misha/20250520/exp1/RNA67_hairpin_force_extension_save_ROI_tracker"
+)
 # DATA_DIRECTORY = "C:/data/Luca/20250414/TX_mtRNAP_7pN"
 # DATA_DIRECTORY = "C:/data/Misha/20250520/exp1/RNA67_hairpin_const_forces_save_ROI"
 # DATA_DIRECTORY = "/home/markhonkoop/tmp/RNA67_hairpin_force_extension_save_ROI_tracker"
@@ -156,6 +156,10 @@ def test_tracker_real_lazy(
         (ROI_SIZE // 4) * 3,
         100,
         3,
+        1,
+        ROI_SIZE // 4,
+        ROI_SIZE // 4,
+        100,
     )
 
     all_yx_coordinates = []
@@ -390,6 +394,10 @@ def test_tracker_time(
         (ROI_SIZE // 4) * 3,
         100,
         3,
+        1,
+        ROI_SIZE // 4,
+        ROI_SIZE // 4,
+        100,
     )
 
     total_elapsed = 0
@@ -459,7 +467,7 @@ def test_tracker_measure_buffer_size(
                 (num_rois, num_z_values, ROI_SIZE, ROI_SIZE), dtype=cupy.float32
             )
             tracker = Tracker(
-                NUM_IMAGES,
+                num_images,
                 roi_coordinates,
                 ROI_SIZE,
                 zstacks,
@@ -468,6 +476,10 @@ def test_tracker_measure_buffer_size(
                 number_of_qi_radial_steps,
                 number_of_qi_angle_steps,
                 number_of_qi_iterations,
+                1,
+                ROI_SIZE // 4,
+                ROI_SIZE // 4,
+                100,
             )
 
             total_elapsed = 0
@@ -482,14 +494,11 @@ def test_tracker_measure_buffer_size(
             for _ in range(num_iters):
                 e1 = cupy.cuda.Event()
                 e1.record()
-                computed_yx_coordinates = tracker.get_calculated_yx()
-                computed_z_values = tracker.get_calculated_z()
                 e2 = cupy.cuda.get_current_stream().record()
 
                 s2.wait_event(e2)
                 with s2:
-                    computed_yx_coordinates_host = cupy.asnumpy(computed_yx_coordinates)
-                    computed_z_values_host = cupy.asnumpy(computed_z_values)
+                    tracker.calculate(images)
 
                 e2.synchronize()
                 t = cupy.cuda.get_elapsed_time(e1, e2)

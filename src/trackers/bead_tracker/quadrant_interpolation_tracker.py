@@ -58,23 +58,17 @@ class QuadrantInterpolationTracker:
         num_images: int,
         roi_coordinates: cupy.ndarray,
         roi_size: int,
+        min_radius: float,
+        max_radius: float,
+        number_of_radial_steps: int,
+        number_of_angle_steps: int,
     ) -> None:
-        # TODO: Make configurable.
         radial_profiler_configs = [
-            # RadialProfilerConfig(
-            #     min_radius=1,
-            #     max_radius=25,
-            #     num_radial_steps=25 * 3,
-            #     num_angle_steps=110,
-            #     start_angle_radians=np.pi / 2 * quadrant_id,
-            #     end_angle_radians=np.pi / 2 * (quadrant_id + 1),
-            #     normalize=False,
-            # )
             RadialProfilerConfig(
-                min_radius=1,
-                max_radius=roi_size / 4,
-                num_radial_steps=(roi_size // 4 - 1) * 3,
-                num_angle_steps=100,
+                min_radius=min_radius,
+                max_radius=max_radius,
+                num_radial_steps=number_of_radial_steps,
+                num_angle_steps=number_of_angle_steps,
                 start_angle_radians=np.pi / 2 * quadrant_id,
                 end_angle_radians=np.pi / 2 * (quadrant_id + 1),
                 normalize=False,
@@ -84,30 +78,20 @@ class QuadrantInterpolationTracker:
         self.__num_images = num_images
         self.__num_beads = roi_coordinates.shape[0]
 
-        self.__radial_profiler_top_right = RadialProfiler(
-            radial_profiler_configs[0],
-            num_images,
-            roi_coordinates,
-            roi_size,
-        )
-        self.__radial_profiler_top_left = RadialProfiler(
-            radial_profiler_configs[1],
-            num_images,
-            roi_coordinates,
-            roi_size,
-        )
-        self.__radial_profiler_bottom_left = RadialProfiler(
-            radial_profiler_configs[2],
-            num_images,
-            roi_coordinates,
-            roi_size,
-        )
-        self.__radial_profiler_bottom_right = RadialProfiler(
-            radial_profiler_configs[3],
-            num_images,
-            roi_coordinates,
-            roi_size,
-        )
+        [
+            self.__radial_profiler_top_right,
+            self.__radial_profiler_top_left,
+            self.__radial_profiler_bottom_left,
+            self.__radial_profiler_bottom_right,
+        ] = [
+            RadialProfiler(
+                config,
+                num_images,
+                roi_coordinates,
+                roi_size,
+            )
+            for config in radial_profiler_configs
+        ]
 
         self.__least_squares_fit_weights = cast(
             cupy.ndarray,
