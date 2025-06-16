@@ -110,7 +110,6 @@ def run_test2(
 
         host_images_buffer1 = camera.get_next_buffer()
         end = time.perf_counter()
-        start_get_buffer1 = time.perf_counter()
         print(f"getting next buffer took {end - start}")
 
         cupy.cuda.runtime.memcpyAsync(
@@ -134,8 +133,6 @@ def run_test2(
         )
         stream2.launch_host_func(handle_result, host_z_values_buffer2)
 
-        start_get_buffer2 = time.perf_counter()
-        print(f"TIME BETWEEN GRABBING BUFFERS: {start_get_buffer2 - start_get_buffer1}")
         start = time.perf_counter()
         host_images_buffer2 = camera.get_next_buffer()
         end = time.perf_counter()
