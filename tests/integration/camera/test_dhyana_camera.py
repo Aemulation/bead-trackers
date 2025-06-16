@@ -12,11 +12,10 @@ from src.trackers.bead_tracker.radial_profiler import RadialProfilerConfig
 from cameras.dhyana2100.camera import Camera, CameraConfig
 from cameras.camera_protocol import CameraFactoryClassRegistry
 
-NUM_Z_LAYERS = 100
-NUM_RADIALS = 25
-NUM_ANGLE_STEPS = 100
-
 ROI_SIZE = 100
+NUM_Z_LAYERS = 100
+NUM_RADIALS = ROI_SIZE // 4
+NUM_ANGLE_STEPS = 100
 
 
 def radial_profiler_config():
@@ -251,20 +250,27 @@ def test_dropped_frames(mock_z_lookup_table: cupy.ndarray, mock_z_values: cupy.n
         print("ADDING BUFFER")
         camera.add_buffer(host_buffer)
 
-    # print("CREATING TRACKER")
-    # trackers = [
-    #     Tracker(
-    #         z_lookup_tables,
-    #         mock_z_values,
-    #         roi_coordinates,
-    #         ROI_SIZE,
-    #         ROI_SIZE,
-    #         num_images,
-    #         radial_profiler_config(),
-    #     )
-    #     # for _ in range(num_streams)
-    #     for _ in range(1)
-    # ]
+    print("CREATING TRACKER")
+    lookup_table_images = cupy.zeros((100, num_rois, ROI_SIZE, ROI_SIZE))
+    trackers = [
+        Tracker(
+            num_images_per_buffer=num_images,
+            roi_coordinates=roi_coordinates,
+            roi_size=ROI_SIZE,
+            lookup_table_images=lookup_table_images,
+            min_qi_radius=1,
+            max_qi_radius=ROI_SIZE / 4,
+            number_of_qi_radial_steps=NUM_RADIALS,
+            number_of_qi_angle_steps=NUM_ANGLE_STEPS,
+            number_of_qi_iterations=3,
+            min_lut_radius=1,
+            max_lut_radius=ROI_SIZE / 4,
+            number_of_lut_radial_steps=NUM_RADIALS,
+            number_of_lut_angle_steps=NUM_ANGLE_STEPS,
+        )
+        # for _ in range(num_streams)
+        for _ in range(1)
+    ]
     #
     # print("DRY RUN TRACKER")
     # # Dry run to compile all cupy code.
