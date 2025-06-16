@@ -272,12 +272,12 @@ def test_dropped_frames(mock_z_lookup_table: cupy.ndarray, mock_z_values: cupy.n
         for _ in range(1)
     ]
     #
-    # print("DRY RUN TRACKER")
-    # # Dry run to compile all cupy code.
-    # for tracker in trackers:
-    #     for _ in range(100):
-    #         tracker.compute_z_values(device_images_buffers[0])
-    #
+    print("DRY RUN TRACKER")
+    # Dry run to compile all cupy code.
+    for tracker in trackers:
+        for _ in range(100):
+            tracker.calculate(device_images_buffers[0])
+
     # time.sleep(3)
     # print(f"Dropped frames before: {camera.get_lost_frames()}")
     print("START RECORDING")
