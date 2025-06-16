@@ -11,7 +11,7 @@ from src.trackers.bead_tracker.radial_profiler import RadialProfilerConfig
 from src.trackers.tracker_base import TrackerProtocol
 
 from cameras.dhyana2100.camera import Camera, CameraConfig
-from cameras.camera_protocol import CameraFactoryClassRegistry
+from cameras.camera_protocol import CameraFactoryClassRegistry, CameraProtocol
 
 
 ROI_SIZE = 100
@@ -91,7 +91,7 @@ def run_test2(
     device_images_buffers,
     host_z_values_buffers,
     trackers: list[TrackerProtocol],
-    camera,
+    camera: CameraProtocol,
     num_rounds,
 ):
     [stream1, stream2] = streams
@@ -204,7 +204,7 @@ def test_dropped_frames(mock_z_lookup_table: cupy.ndarray, mock_z_values: cupy.n
     dhyana2100_arguments = {
         "camera_index": 0,
         "enable_fan": False,
-        "number_of_copy_threads_per_buffer": 8,
+        "number_of_copy_threads_per_buffer": 64,
     }
     camera = CameraFactoryClassRegistry.create("dhyana2100", **dhyana2100_arguments)
     print("OPENING CAMERA")
