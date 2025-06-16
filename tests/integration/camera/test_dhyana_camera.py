@@ -208,7 +208,7 @@ def test_dropped_frames(mock_z_lookup_table: cupy.ndarray, mock_z_values: cupy.n
         "enable_fan": False,
         "number_of_copy_threads_per_buffer": 8,
     }
-    camera = CameraFactoryClassRegistry.create("foo", **dhyana2100_arguments)
+    camera = CameraFactoryClassRegistry.create("dhyana2100", **dhyana2100_arguments)
     print("OPENING CAMERA")
     camera.open()
 
