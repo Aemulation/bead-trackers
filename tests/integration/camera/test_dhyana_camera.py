@@ -251,7 +251,7 @@ def test_dropped_frames(mock_z_lookup_table: cupy.ndarray, mock_z_values: cupy.n
 
     print("CREATING TRACKER")
     lookup_table_images = cupy.zeros((num_rois, 100, ROI_SIZE, ROI_SIZE))
-    trackers = [
+    trackers: list[TrackerProtocol] = [
         Tracker(
             num_images_per_buffer=num_images,
             roi_coordinates=roi_coordinates,
@@ -295,7 +295,7 @@ def test_dropped_frames(mock_z_lookup_table: cupy.ndarray, mock_z_values: cupy.n
     )
     print(f"Dropped after warm-up: {camera.get_lost_frames()}")
 
-    num_rounds = 300
+    num_rounds = 3000
     run_test2(
         streams,
         device_images_buffers,
