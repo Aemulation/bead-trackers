@@ -10,6 +10,7 @@ from src.trackers.bead_tracker.tracker import Tracker
 from src.trackers.bead_tracker.radial_profiler import RadialProfilerConfig
 
 from cameras.dhyana2100.camera import Camera, CameraConfig
+from cameras.camera_protocol import CameraFactoryClassRegistry
 
 NUM_Z_LAYERS = 100
 NUM_RADIALS = 25
@@ -176,173 +177,139 @@ def make_roi_coordinates(
     return cupy.sort(cupy.column_stack((random_y, random_x)))
 
 
-# def test_dropped_frames(mock_z_lookup_table: cupy.ndarray, mock_z_values: cupy.ndarray):
-#     print("\nHello from cupy-test!")
-#
-#     # mock_bead_coordinates = cupy.array(
-#     #     [
-#     #         [387, 1380],
-#     #         [774, 817],
-#     #         [965, 455],
-#     #         [1468, 128],
-#     #     ],
-#     #     dtype=cupy.uint32,
-#     # )
-#     # mock_bead_coordinates = (
-#     #     cupy.repeat(mock_bead_coordinates, 100, axis=0).astype(cupy.uint32).copy()
-#     # )
-#     # roi_coordinates = (
-#     #     mock_bead_coordinates
-#     #     - cupy.array([roi_height // 2, roi_width // 2], dtype=cupy.uint32).copy()
-#     # )
-#     num_rois = 600
-#
-#     z_lookup_tables = cupy.array([mock_z_lookup_table for _ in range(num_rois)])
-#
-#     num_images = 300
-#
-#     print("CREATING CAMERA")
-#     camera = Camera()
-#     print("OPENING CAMERA")
-#     camera.open(0, 128)
-#
-#     print("DISABLEING FAN")
-#     camera.set_temperature(False, True)
-#
-#     print("TEMPERATURE")
-#     print(camera.get_temperature())
-#
-#     print("UPDATING CONFIG")
-#     camera.update_configs()
-#
-#     print("CAMERA CONFIG")
-#     print(camera.config.to_dict())
-#
-#     print("SETTING CONFIG")
-#     camera_config = CameraConfig(
-#         **{
-#             "width": 2560,
-#             "height": 2016,
-#             "offsetx": 0,
-#             "offsety": 0,
-#             "exposure_ms": 1,
-#             "framerate": 970,
-#             "num_buffer_frames": 256,
-#             "fast_binning": 1,
-#             "trigger_frames": 1,
-#             "bits_per_pixel": 12,
-#             "input_trigger": 0,
-#             "full_mode": 1,
-#         }
-#     )
-#     camera.set_config(camera_config)
-#
-#     print("CAMERA CONFIG")
-#     print(camera.config.to_dict())
-#
-#     print("SETTING CONFIG")
-#     camera_config = CameraConfig(
-#         **(
-#             camera.config.to_dict()
-#             | {
-#                 "framerate": 970,
-#             }
-#         )
-#     )
-#
-#     print("CAMERA CONFIG")
-#     print(camera.config.to_dict())
-#
-#     image_height = camera.config.height
-#     image_width = camera.config.width
-#     print(f"FPS: {camera.config.framerate}")
-#
-#     print(f"image_height: {image_height}")
-#     print(f"image_width: {image_width}")
-#
-#     roi_coordinates = make_roi_coordinates(
-#         num_rois, image_height, image_width, ROI_SIZE
-#     )
-#     num_host_buffers = 5
-#     host_images_buffers = [
-#         cupyx.zeros_pinned((num_images, image_height, image_width), dtype=cupy.uint16)
-#         for _ in range(num_host_buffers)
-#     ]
-#     num_streams = 2
-#     device_images_buffers = [
-#         cupy.empty((num_images, image_height, image_width), dtype=cupy.uint16)
-#         for _ in range(num_streams)
-#     ]
-#     streams = [cupy.cuda.Stream(non_blocking=True) for _ in range(num_streams)]
-#     host_z_values_buffers = [
-#         cupyx.zeros_pinned((num_images, num_rois), dtype=cupy.float32)
-#         for _ in range(num_streams)
-#     ]
-#
-#     for host_buffer in host_images_buffers:
-#         print("ADDING BUFFER")
-#         camera.add_buffer(host_buffer)
-#
-#     print("CREATING TRACKER")
-#     trackers = [
-#         Tracker(
-#             z_lookup_tables,
-#             mock_z_values,
-#             roi_coordinates,
-#             ROI_SIZE,
-#             ROI_SIZE,
-#             num_images,
-#             radial_profiler_config(),
-#         )
-#         # for _ in range(num_streams)
-#         for _ in range(1)
-#     ]
-#
-#     print("DRY RUN TRACKER")
-#     # Dry run to compile all cupy code.
-#     for tracker in trackers:
-#         for _ in range(100):
-#             tracker.compute_z_values(device_images_buffers[0])
-#
-#     time.sleep(3)
-#     print(f"Dropped frames before: {camera.get_lost_frames()}")
-#     start = time.perf_counter()
-#     camera.start()
-#
-#     print("DRY RUN CAMERA + TRACKER")
-#     num_dry_run_rounds = 10
-#     run_test2(
-#         streams,
-#         device_images_buffers,
-#         host_z_values_buffers,
-#         trackers,
-#         camera,
-#         num_dry_run_rounds,
-#     )
-#     print(f"Dropped after warm-up: {camera.get_lost_frames()}")
-#
-#     num_rounds = 30
-#     run_test2(
-#         streams,
-#         device_images_buffers,
-#         host_z_values_buffers,
-#         trackers,
-#         camera,
-#         num_rounds,
-#     )
-#
-#     print(f"Dropped before stop: {camera.get_lost_frames()}")
-#     print("TEMPERATURE")
-#     print(camera.get_temperature())
-#     camera.stop()
-#     print(f"Dropped after stop: {camera.get_lost_frames()}")
-#     print("TEMPERATURE")
-#     camera.get_temperature()
-#     for stream in streams:
-#         stream.synchronize()
-#         # np.append(computed_z_values, computed_z_values1)
-#
-#     end = time.perf_counter()
-#     print(f"Dropped frames after: {camera.get_lost_frames()}")
-#     print(f"Elapsed: {end - start}")
-#     assert camera.get_lost_frames() == 0
+def test_dropped_frames(mock_z_lookup_table: cupy.ndarray, mock_z_values: cupy.ndarray):
+    print("\nHello from cupy-test!")
+
+    # mock_bead_coordinates = cupy.array(
+    #     [
+    #         [387, 1380],
+    #         [774, 817],
+    #         [965, 455],
+    #         [1468, 128],
+    #     ],
+    #     dtype=cupy.uint32,
+    # )
+    # mock_bead_coordinates = (
+    #     cupy.repeat(mock_bead_coordinates, 100, axis=0).astype(cupy.uint32).copy()
+    # )
+    # roi_coordinates = (
+    #     mock_bead_coordinates
+    #     - cupy.array([roi_height // 2, roi_width // 2], dtype=cupy.uint32).copy()
+    # )
+    num_rois = 600
+
+    z_lookup_tables = cupy.array([mock_z_lookup_table for _ in range(num_rois)])
+
+    num_images = 300
+
+    print("CREATING CAMERA")
+    dhyana2100_arguments = {
+        "camera_index": 0,
+        "enable_fan": False,
+        "number_of_copy_threads_per_buffer": 8,
+    }
+    camera = CameraFactoryClassRegistry.create("foo", **dhyana2100_arguments)
+    print("OPENING CAMERA")
+    camera.open()
+
+    camera.set_width(2560)
+    camera.set_height(2016)
+    camera.set_framerate(970)
+
+    print("CAMERA CONFIG")
+    print(camera.get_width())
+    print(camera.get_height())
+    print(camera.get_framerate())
+
+    image_height = camera.get_height()
+    image_width = camera.get_width()
+    print(f"FPS: {camera.get_framerate()}")
+
+    print(f"image_height: {image_height}")
+    print(f"image_width: {image_width}")
+
+    roi_coordinates = make_roi_coordinates(
+        num_rois, image_height, image_width, ROI_SIZE
+    )
+    num_host_buffers = 5
+    host_images_buffers = [
+        cupyx.zeros_pinned((num_images, image_height, image_width), dtype=cupy.uint16)
+        for _ in range(num_host_buffers)
+    ]
+    num_streams = 2
+    device_images_buffers = [
+        cupy.empty((num_images, image_height, image_width), dtype=cupy.uint16)
+        for _ in range(num_streams)
+    ]
+    streams = [cupy.cuda.Stream(non_blocking=True) for _ in range(num_streams)]
+    host_z_values_buffers = [
+        cupyx.zeros_pinned((num_images, num_rois), dtype=cupy.float32)
+        for _ in range(num_streams)
+    ]
+
+    for host_buffer in host_images_buffers:
+        print("ADDING BUFFER")
+        camera.add_buffer(host_buffer)
+
+    # print("CREATING TRACKER")
+    # trackers = [
+    #     Tracker(
+    #         z_lookup_tables,
+    #         mock_z_values,
+    #         roi_coordinates,
+    #         ROI_SIZE,
+    #         ROI_SIZE,
+    #         num_images,
+    #         radial_profiler_config(),
+    #     )
+    #     # for _ in range(num_streams)
+    #     for _ in range(1)
+    # ]
+    #
+    # print("DRY RUN TRACKER")
+    # # Dry run to compile all cupy code.
+    # for tracker in trackers:
+    #     for _ in range(100):
+    #         tracker.compute_z_values(device_images_buffers[0])
+    #
+    # time.sleep(3)
+    # print(f"Dropped frames before: {camera.get_lost_frames()}")
+    print("START RECORDING")
+    start = time.perf_counter()
+    camera.start_recording()
+    #
+    # print("DRY RUN CAMERA + TRACKER")
+    # num_dry_run_rounds = 10
+    # run_test2(
+    #     streams,
+    #     device_images_buffers,
+    #     host_z_values_buffers,
+    #     trackers,
+    #     camera,
+    #     num_dry_run_rounds,
+    # )
+    # print(f"Dropped after warm-up: {camera.get_lost_frames()}")
+    #
+    # num_rounds = 30
+    # run_test2(
+    #     streams,
+    #     device_images_buffers,
+    #     host_z_values_buffers,
+    #     trackers,
+    #     camera,
+    #     num_rounds,
+    # )
+
+    print(f"Dropped before stop: {camera.get_lost_frames()}")
+    print("TEMPERATURE")
+    camera.stop_recording()
+    print(f"Dropped after stop: {camera.get_lost_frames()}")
+    print("TEMPERATURE")
+    for stream in streams:
+        stream.synchronize()
+        # np.append(computed_z_values, computed_z_values1)
+
+    end = time.perf_counter()
+    print(f"Dropped frames after: {camera.get_lost_frames()}")
+    print(f"Elapsed: {end - start}")
+    assert camera.get_lost_frames() == 0
