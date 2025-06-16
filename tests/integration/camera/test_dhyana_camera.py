@@ -283,28 +283,28 @@ def test_dropped_frames(mock_z_lookup_table: cupy.ndarray, mock_z_values: cupy.n
     print("START RECORDING")
     start = time.perf_counter()
     camera.start_recording()
-    #
-    # print("DRY RUN CAMERA + TRACKER")
-    # num_dry_run_rounds = 10
-    # run_test2(
-    #     streams,
-    #     device_images_buffers,
-    #     host_z_values_buffers,
-    #     trackers,
-    #     camera,
-    #     num_dry_run_rounds,
-    # )
-    # print(f"Dropped after warm-up: {camera.get_lost_frames()}")
-    #
-    # num_rounds = 30
-    # run_test2(
-    #     streams,
-    #     device_images_buffers,
-    #     host_z_values_buffers,
-    #     trackers,
-    #     camera,
-    #     num_rounds,
-    # )
+
+    print("DRY RUN CAMERA + TRACKER")
+    num_dry_run_rounds = 10
+    run_test2(
+        streams,
+        device_images_buffers,
+        host_z_values_buffers,
+        trackers,
+        camera,
+        num_dry_run_rounds,
+    )
+    print(f"Dropped after warm-up: {camera.get_lost_frames()}")
+
+    num_rounds = 30
+    run_test2(
+        streams,
+        device_images_buffers,
+        host_z_values_buffers,
+        trackers,
+        camera,
+        num_rounds,
+    )
 
     print(f"Dropped before stop: {camera.get_lost_frames()}")
     print("TEMPERATURE")
