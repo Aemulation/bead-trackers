@@ -295,7 +295,7 @@ def test_dropped_frames(mock_z_lookup_table: cupy.ndarray, mock_z_values: cupy.n
     )
     print(f"Dropped after warm-up: {camera.get_lost_frames()}")
 
-    num_rounds = 30
+    num_rounds = 300
     run_test2(
         streams,
         device_images_buffers,
