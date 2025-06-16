@@ -12,6 +12,8 @@ from src.trackers.bead_tracker.radial_profiler import RadialProfilerConfig
 from cameras.dhyana2100.camera import Camera, CameraConfig
 from cameras.camera_protocol import CameraFactoryClassRegistry
 
+from trackers.tracker_base import TrackerProtocol
+
 ROI_SIZE = 100
 NUM_Z_LAYERS = 100
 NUM_RADIALS = ROI_SIZE // 4
@@ -42,7 +44,7 @@ def run_test(
     streams,
     device_images_buffers,
     host_z_values_buffers,
-    trackers,
+    trackers: list[TrackerProtocol],
     camera,
     num_rounds,
 ):
@@ -72,9 +74,8 @@ def run_test(
                     stream.ptr,
                 )
 
-                (yx_coordinates, z_values) = tracker.compute_z_values(
-                    device_images_buffer
-                )
+                tracker.calculate(device_images_buffer)
+                z_values = tracker.get_calculated_z()
 
                 cupy.cuda.runtime.memcpyAsync(
                     host_z_values_buffer.ctypes.data,
@@ -89,7 +90,7 @@ def run_test2(
     streams,
     device_images_buffers,
     host_z_values_buffers,
-    trackers,
+    trackers: list[TrackerProtocol],
     camera,
     num_rounds,
 ):
@@ -123,9 +124,8 @@ def run_test2(
         # stream2.synchronize()
         # start = time.perf_counter()
         with stream2:
-            (_, device_z_values_buffer2) = tracker.compute_z_values(
-                device_images_buffer2
-            )
+            tracker.calculate(device_images_buffer2)
+            device_z_values_buffer2 = tracker.get_calculated_z()
 
         # end = time.perf_counter()
         # print(f"tracker1 took {end - start}")
@@ -152,9 +152,8 @@ def run_test2(
         # stream1.synchronize()
         # start = time.perf_counter()
         with stream1:
-            (_, device_z_values_buffer1) = tracker.compute_z_values(
-                device_images_buffer1
-            )
+            tracker.calculate(device_images_buffer1)
+            device_z_values_buffer1 = tracker.get_calculated_z()
         # end = time.perf_counter()
         # print(f"tracker2 took {end - start}")
         device_z_values_buffer1.get(
