@@ -251,7 +251,7 @@ def test_dropped_frames(mock_z_lookup_table: cupy.ndarray, mock_z_values: cupy.n
         camera.add_buffer(host_buffer)
 
     print("CREATING TRACKER")
-    lookup_table_images = cupy.zeros((100, num_rois, ROI_SIZE, ROI_SIZE))
+    lookup_table_images = cupy.zeros((num_rois, 100, ROI_SIZE, ROI_SIZE))
     trackers = [
         Tracker(
             num_images_per_buffer=num_images,
