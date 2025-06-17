@@ -21,23 +21,23 @@ def copy_image(destination_id):
     np.copyto(destination[destination_id], source[destination_id])
 
 
-multithreaded_results = []
-for _ in range(num_iters + num_warmup):
-    start = time.perf_counter()
-    for i in range(number_of_frames_per_buffer):
-        thread = threading.Thread(target=copy_image, args=(i,))
-        thread.start()
-        threads.append(thread)
-
-    for thread in threads:
-        thread.join()
-
-    end = time.perf_counter()
-    print(f"multi threaded elapsed: {(end - start) * 1_000}ms ")
-    multithreaded_results.append(end - start)
-for _ in range(num_warmup):
-    multithreaded_results.pop(0)
-multithreaded_results = np.array(multithreaded_results)
+# multithreaded_results = []
+# for _ in range(num_iters + num_warmup):
+#     start = time.perf_counter()
+#     for i in range(number_of_frames_per_buffer):
+#         thread = threading.Thread(target=copy_image, args=(i,))
+#         thread.start()
+#         threads.append(thread)
+#
+#     for thread in threads:
+#         thread.join()
+#
+#     end = time.perf_counter()
+#     print(f"multi threaded elapsed: {(end - start) * 1_000}ms ")
+#     multithreaded_results.append(end - start)
+# for _ in range(num_warmup):
+#     multithreaded_results.pop(0)
+# multithreaded_results = np.array(multithreaded_results)
 
 threadpool_results = []
 for _ in range(num_iters + num_warmup):
