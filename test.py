@@ -13,7 +13,7 @@ image_size = (2016, 2560)
 source = np.ones((number_of_frames_per_buffer, *image_size), dtype=np.uint16)
 destination = np.zeros((number_of_frames_per_buffer, *image_size), dtype=np.uint16)
 
-num_iters = 100
+num_iters = 10
 num_warmup = 10
 
 
