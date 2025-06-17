@@ -21,60 +21,68 @@ def copy_image(destination_id):
     np.copyto(destination[destination_id], source[destination_id])
 
 
-# multithreaded_results = []
-# for _ in range(num_iters + num_warmup):
-#     start = time.perf_counter()
-#     for i in range(number_of_frames_per_buffer):
-#         thread = threading.Thread(target=copy_image, args=(i,))
-#         thread.start()
-#         threads.append(thread)
-#
-#     for thread in threads:
-#         thread.join()
-#
-#     end = time.perf_counter()
-#     print(f"multi threaded elapsed: {(end - start) * 1_000}ms ")
-#     multithreaded_results.append(end - start)
-# for _ in range(num_warmup):
-#     multithreaded_results.pop(0)
-# multithreaded_results = np.array(multithreaded_results)
+multithreaded_results = []
+for i in range(num_iters + num_warmup):
+    start = time.perf_counter()
+    for i in range(number_of_frames_per_buffer):
+        thread = threading.Thread(target=copy_image, args=(i,))
+        thread.start()
+        threads.append(thread)
+
+    for thread in threads:
+        thread.join()
+
+    end = time.perf_counter()
+    print(
+        f"{i}/{num_iters + num_warmup}: multi threaded elapsed: {(end - start) * 1_000}ms "
+    )
+    multithreaded_results.append(end - start)
+for _ in range(num_warmup):
+    multithreaded_results.pop(0)
+multithreaded_results = np.array(multithreaded_results)
 
 threadpool_results = []
-for _ in range(num_iters + num_warmup):
+for i in range(num_iters + num_warmup):
     start = time.perf_counter()
     with concurrent.futures.ThreadPoolExecutor(5) as executor:
         for i in range(number_of_frames_per_buffer):
             executor.submit(copy_image, i)
 
     end = time.perf_counter()
-    print(f"threadpool elapsed: {(end - start) * 1_000}ms ")
+    print(
+        f"{i}/{num_iters + num_warmup}: threadpool elapsed: {(end - start) * 1_000}ms "
+    )
     threadpool_results.append(end - start)
 for _ in range(num_warmup):
     threadpool_results.pop(0)
 threadpool_results = np.array(threadpool_results)
 
 multiprocessing_results = []
-for _ in range(num_iters + num_warmup):
+for i in range(num_iters + num_warmup):
     start = time.perf_counter()
     with multiprocessing.Pool(5) as pool:
         pool.map(copy_image, range(number_of_frames_per_buffer))
 
     end = time.perf_counter()
-    print(f"multiprocessing elapsed: {(end - start) * 1_000}ms ")
+    print(
+        f"{i}/{num_iters + num_warmup}: multiprocessing elapsed: {(end - start) * 1_000}ms "
+    )
     multiprocessing_results.append(end - start)
 for _ in range(num_warmup):
     multiprocessing_results.pop(0)
 multiprocessing_results = np.array(multiprocessing_results)
 
 singlethreaded_results = []
-for _ in range(num_iters + num_warmup):
+for i in range(num_iters + num_warmup):
     start = time.perf_counter()
 
     for i in range(number_of_frames_per_buffer):
         copy_image(i)
 
     end = time.perf_counter()
-    print(f"single threaded elapsed: {(end - start) * 1_000}ms ")
+    print(
+        f"{i}/{num_iters + num_warmup}: single threaded elapsed: {(end - start) * 1_000}ms "
+    )
     singlethreaded_results.append(end - start)
 for _ in range(num_warmup):
     singlethreaded_results.pop(0)
