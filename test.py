@@ -39,19 +39,19 @@ for _ in range(num_warmup):
     multithreaded_results.pop(0)
 multithreaded_results = np.array(multithreaded_results)
 
-# threadpool_results = []
-# for _ in range(num_iters + num_warmup):
-#     start = time.perf_counter()
-#     with concurrent.futures.ThreadPoolExecutor(5) as executor:
-#         for i in range(number_of_frames_per_buffer):
-#             executor.submit(copy_image, i)
-#
-#     end = time.perf_counter()
-#     print(f"threadpool elapsed: {(end - start) * 1_000}ms ")
-#     threadpool_results.append(end - start)
-# for _ in range(num_warmup):
-#     threadpool_results.pop(0)
-# threadpool_results = np.array(threadpool_results)
+threadpool_results = []
+for _ in range(num_iters + num_warmup):
+    start = time.perf_counter()
+    with concurrent.futures.ThreadPoolExecutor(5) as executor:
+        for i in range(number_of_frames_per_buffer):
+            executor.submit(copy_image, i)
+
+    end = time.perf_counter()
+    print(f"threadpool elapsed: {(end - start) * 1_000}ms ")
+    threadpool_results.append(end - start)
+for _ in range(num_warmup):
+    threadpool_results.pop(0)
+threadpool_results = np.array(threadpool_results)
 
 multiprocessing_results = []
 for _ in range(num_iters + num_warmup):
