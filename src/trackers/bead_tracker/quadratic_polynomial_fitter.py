@@ -40,10 +40,11 @@ class QuadraticPolynomialFitter:
             weighted_points.T,
         )
         # return coefficients.T
+        coefficients = coefficients.T
 
-        coefficients = cupy.linalg.solve(
-            self.__x_matrix @ self.__x_matrix.T, self.__x_matrix @ weighted_points.T
-        ).T
+        # coefficients = cupy.linalg.solve(
+        #     self.__x_matrix @ self.__x_matrix.T, self.__x_matrix @ weighted_points.T
+        # ).T
         end = time.perf_counter()
         print(f"least sqaures took {end - start} seconds on cpu")
         return coefficients
