@@ -34,19 +34,19 @@ class QuadraticPolynomialFitter:
 
         weighted_points = points_table * self.__square_root_weights[cupy.newaxis, :]
 
-        start = time.perf_counter()
-        (coefficients, _, _, _) = cupy.linalg.lstsq(
-            self.__x_matrix.T,
-            weighted_points.T,
-        )
+        # start = time.perf_counter()
+        # (coefficients, _, _, _) = cupy.linalg.lstsq(
+        #     self.__x_matrix.T,
+        #     weighted_points.T,
+        # )
         # return coefficients.T
-        coefficients = coefficients.T
+        # coefficients = coefficients.T
 
-        # coefficients = cupy.linalg.solve(
-        #     self.__x_matrix @ self.__x_matrix.T, self.__x_matrix @ weighted_points.T
-        # ).T
-        end = time.perf_counter()
-        print(f"least sqaures took {end - start} seconds on cpu")
+        coefficients = cupy.linalg.solve(
+            self.__x_matrix @ self.__x_matrix.T, self.__x_matrix @ weighted_points.T
+        ).T
+        # end = time.perf_counter()
+        # print(f"least sqaures took {end - start} seconds on cpu")
         return coefficients
 
     def get_top(self, coefficients: cupy.ndarray) -> cupy.ndarray:
