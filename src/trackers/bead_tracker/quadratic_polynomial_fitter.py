@@ -35,10 +35,10 @@ class QuadraticPolynomialFitter:
         weighted_points = points_table * self.__square_root_weights[cupy.newaxis, :]
 
         start = time.perf_counter()
-        # (coefficients, _, _, _) = cupy.linalg.lstsq(
-        #     self.__x_matrix.T,
-        #     weighted_points.T,
-        # )
+        (coefficients, _, _, _) = cupy.linalg.lstsq(
+            self.__x_matrix.T,
+            weighted_points.T,
+        )
         # return coefficients.T
 
         coefficients = cupy.linalg.solve(
