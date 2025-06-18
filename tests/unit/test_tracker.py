@@ -527,3 +527,73 @@ def test_tracker_measure_buffer_size(
 
         with open(f"test-results/buffer-sizes/{file_name}.json", "w") as file:
             json.dump(data, file)
+
+
+def test_tracker_measure_transfer_time(
+    camera_image: cupy.ndarray,
+):
+    cupy.random.seed(42)
+
+    buffer_sizes = [
+        1,
+        10,
+        100,
+        200,
+        300,
+        400,
+    ]
+
+    pathlib.Path("test-results/data-transfer").mkdir(parents=True, exist_ok=True)
+
+    data = {}
+    for num_images in buffer_sizes:
+        images = cupy.repeat(cupy.expand_dims(camera_image, axis=0), num_images, axis=0)
+        host_images = np.zeros_like(images)
+
+        total_elapsed = 0
+        num_iters = 1000
+        s2 = cupy.cuda.Stream()
+
+        # Warmup
+        for _ in range(10):
+            cupy.cuda.runtime.memcpyAsync(
+                images.data.ptr,
+                host_images.ctypes.data,
+                host_images.nbytes,
+                cupy.cuda.runtime.memcpyHostToDevice,
+                s2.ptr,
+            )
+
+        elapsed_times = []
+        for _ in range(num_iters):
+            e1 = cupy.cuda.Event()
+            e1.record()
+            e2 = cupy.cuda.get_current_stream().record()
+
+            s2.wait_event(e2)
+            with s2:
+                cupy.cuda.runtime.memcpyAsync(
+                    images.data.ptr,
+                    host_images.ctypes.data,
+                    host_images.nbytes,
+                    cupy.cuda.runtime.memcpyHostToDevice,
+                    s2.ptr,
+                )
+
+            e2.synchronize()
+            t = cupy.cuda.get_elapsed_time(e1, e2)
+            total_elapsed += t
+            print(f"ELAPSED: {t}ms")
+            elapsed_times.append(total_elapsed)
+
+        print(f"AVERAGE ELAPSED: {total_elapsed / (num_iters - 1)}ms")
+        data[num_images] = elapsed_times
+
+    data["parameters"] = {}
+
+    file_name = ",".join(
+        [f"{key}={value}" for key, value in data["parameters"].items()]
+    )
+
+    with open(f"test-results/data-transfer/{file_name}.json", "w") as file:
+        json.dump(data, file)
