@@ -541,6 +541,7 @@ def test_tracker_measure_transfer_time(
         200,
         300,
         400,
+        500,
     ]
 
     pathlib.Path("test-results/data-transfer").mkdir(parents=True, exist_ok=True)
