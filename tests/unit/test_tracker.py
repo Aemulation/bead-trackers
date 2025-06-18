@@ -23,7 +23,7 @@ from tests.unit.conftest import NUM_RADIALS, NUM_Z_LAYERS, make_roi_coordinates
 import time
 
 
-NUM_IMAGES = 10
+NUM_IMAGES = 100
 ROI_SIZE = 60
 
 NUM_RADIAL_STEPS = (ROI_SIZE // 4) - 1
@@ -377,7 +377,7 @@ def test_tracker_time(
 ):
     images = cupy.repeat(cupy.expand_dims(camera_image, axis=0), NUM_IMAGES, axis=0)
 
-    num_rois = 40
+    num_rois = 400
     height, width = camera_image.shape
     roi_coordinates = make_roi_coordinates(num_rois, height, width, ROI_SIZE)
 
