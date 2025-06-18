@@ -558,7 +558,7 @@ def test_tracker_measure_transfer_time(
         for _ in range(10):
             cupy.cuda.runtime.memcpyAsync(
                 images.data.ptr,
-                host_images.ctypes.data,
+                host_images.data,
                 host_images.nbytes,
                 cupy.cuda.runtime.memcpyHostToDevice,
                 s2.ptr,
