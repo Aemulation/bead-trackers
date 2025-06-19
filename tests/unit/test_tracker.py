@@ -593,9 +593,8 @@ def test_tracker_measure_transfer_time(
                     cupy.cuda.runtime.memcpyHostToDevice,
                     s2.ptr,
                 )
+                e2.record()
 
-            s2.synchronize()
-            e2.record()
             e2.synchronize()
             t = cupy.cuda.get_elapsed_time(e1, e2)
             total_elapsed += t
@@ -633,9 +632,8 @@ def test_tracker_measure_transfer_time(
                     cupy.cuda.runtime.memcpyDeviceToHost,
                     s2.ptr,
                 )
+                e2.record()
 
-            s2.synchronize()
-            e2.record()
             e2.synchronize()
             t = cupy.cuda.get_elapsed_time(e1, e2)
             total_elapsed += t
