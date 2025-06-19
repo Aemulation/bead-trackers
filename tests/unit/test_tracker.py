@@ -405,7 +405,6 @@ def test_tracker_time(
 
     total_elapsed = 0
     num_iters = 1000
-    s2 = cupy.cuda.Stream()
 
     # Warmup
     for _ in range(10):
@@ -413,18 +412,17 @@ def test_tracker_time(
 
     for _ in range(num_iters):
         e1 = cupy.cuda.Event()
+        e2 = cupy.cuda.Event()
         e1.record()
         tracker.calculate(images)
-        e2 = cupy.cuda.get_current_stream().record()
-
-        s2.wait_event(e2)
+        e2.record()
 
         e2.synchronize()
         t = cupy.cuda.get_elapsed_time(e1, e2)
         total_elapsed += t
         print(f"ELAPSED: {t}ms")
 
-    print(f"AVERAGE ELAPSED: {total_elapsed / (num_iters - 1)}ms")
+    print(f"AVERAGE ELAPSED: {total_elapsed / (num_iters)}ms")
 
 
 def test_tracker_measure_buffer_size(
