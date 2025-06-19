@@ -437,6 +437,7 @@ def test_tracker_measure_buffer_size(
         200,
         300,
         400,
+        500,
     ]
     num_roises = [
         100,
