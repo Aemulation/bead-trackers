@@ -582,10 +582,9 @@ def test_tracker_measure_transfer_time(
 
         elapsed_times = []
         for _ in range(num_iters):
-            e1 = cupy.cuda.Event()
-            e2 = cupy.cuda.Event()
-
             with s2:
+                e1 = cupy.cuda.Event()
+                e2 = cupy.cuda.Event()
                 e1.record()
                 cupy.cuda.runtime.memcpyAsync(
                     images.data.ptr,
@@ -621,10 +620,9 @@ def test_tracker_measure_transfer_time(
 
         elapsed_times = []
         for _ in range(num_iters):
-            e1 = cupy.cuda.Event()
-            e2 = cupy.cuda.Event()
-
             with s2:
+                e1 = cupy.cuda.Event()
+                e2 = cupy.cuda.Event()
                 e1.record()
                 cupy.cuda.runtime.memcpyAsync(
                     host_z_values.ctypes.data,
