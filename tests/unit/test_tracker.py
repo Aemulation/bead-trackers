@@ -506,10 +506,10 @@ def test_tracker_measure_buffer_size(
                 t = cupy.cuda.get_elapsed_time(e1, e2)
 
                 total_elapsed += t
-                print(f"ELAPSED: {t}s")
+                print(f"ELAPSED: {t}ms")
                 elapsed_times.append(t)
 
-            print(f"AVERAGE ELAPSED: {total_elapsed / (num_iters - 1)}s")
+            print(f"AVERAGE ELAPSED: {total_elapsed / (num_iters - 1)}ms")
             data[num_images] = elapsed_times
 
         data["parameters"] = {
