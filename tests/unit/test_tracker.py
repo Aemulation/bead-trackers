@@ -460,8 +460,8 @@ def test_tracker_measure_buffer_size(
     for num_rois in num_roises:
         data = {}
         for num_images in buffer_sizes:
-            cupy.get_default_memory_pool().free_all_blocks()
-            cupy.get_default_pinned_memory_pool().free_all_blocks()
+            # cupy.get_default_memory_pool().free_all_blocks()
+            # cupy.get_default_pinned_memory_pool().free_all_blocks()
             images = cupy.repeat(
                 cupy.expand_dims(camera_image, axis=0), num_images, axis=0
             )
@@ -558,6 +558,8 @@ def test_tracker_measure_transfer_time(
     for num_images in buffer_sizes:
         cupy.get_default_memory_pool().free_all_blocks()
         cupy.get_default_pinned_memory_pool().free_all_blocks()
+        print(camera_image.shape)
+        print(camera_image.nbytes)
         images = cupy.repeat(cupy.expand_dims(camera_image, axis=0), num_images, axis=0)
         host_images = np.zeros_like(images)
 
@@ -597,10 +599,20 @@ def test_tracker_measure_transfer_time(
             e2.synchronize()
             t = cupy.cuda.get_elapsed_time(e1, e2)
             total_elapsed += t
-            print(f"ELAPSED: {t}s")
+            # print(f"ELAPSED: {t}s")
             elapsed_times.append(t)
         print(f"AVERAGE ELAPSED TO DEVICE: {total_elapsed / (num_iters - 1)}s")
         data["transfer_to_device"][num_images] = elapsed_times
+
+        # Warmup
+        for _ in range(10):
+            cupy.cuda.runtime.memcpyAsync(
+                host_z_values.ctypes.data,
+                device_z_values.data.ptr,
+                device_z_values.nbytes,
+                cupy.cuda.runtime.memcpyDeviceToHost,
+                s2.ptr,
+            )
 
         elapsed_times = []
         for _ in range(num_iters):
@@ -621,7 +633,7 @@ def test_tracker_measure_transfer_time(
             e2.synchronize()
             t = cupy.cuda.get_elapsed_time(e1, e2)
             total_elapsed += t
-            print(f"ELAPSED: {t}s")
+            # print(f"ELAPSED: {t}s")
             elapsed_times.append(t)
         print(f"AVERAGE ELAPSED TO HOST: {total_elapsed / (num_iters - 1)}s")
         data["transfer_to_device"][num_images] = elapsed_times
