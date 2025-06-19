@@ -584,8 +584,8 @@ def test_tracker_measure_transfer_time(
             e1 = cupy.cuda.Event()
             e1.record()
 
+            e2 = cupy.cuda.get_current_stream().record()
             with s2:
-                e2 = cupy.cuda.get_current_stream().record()
                 cupy.cuda.runtime.memcpyAsync(
                     images.data.ptr,
                     host_images.data.ptr,
@@ -619,8 +619,8 @@ def test_tracker_measure_transfer_time(
             e1 = cupy.cuda.Event()
             e1.record()
 
+            e2 = cupy.cuda.get_current_stream().record()
             with s2:
-                e2 = cupy.cuda.get_current_stream().record()
                 cupy.cuda.runtime.memcpyAsync(
                     host_z_values.ctypes.data,
                     device_z_values.data.ptr,
