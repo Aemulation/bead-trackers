@@ -195,8 +195,7 @@ def test_dropped_frames(mock_z_lookup_table: cupy.ndarray, mock_z_values: cupy.n
 
     z_lookup_tables = cupy.array([mock_z_lookup_table for _ in range(num_rois)])
 
-    # num_images = 300
-    num_images = 10
+    num_images = 300
 
     print("CREATING CAMERA")
     dhyana2100_arguments = {
