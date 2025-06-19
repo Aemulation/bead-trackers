@@ -569,6 +569,7 @@ def test_tracker_measure_transfer_time(
         s2 = cupy.cuda.Stream()
 
         assert images.nbytes == host_images.nbytes
+        assert images.nbytes == num_images * 2560 * 2016 * 2
         # Warmup
         for _ in range(10):
             cupy.cuda.runtime.memcpyAsync(
@@ -584,14 +585,16 @@ def test_tracker_measure_transfer_time(
             e1 = cupy.cuda.Event()
             e2 = cupy.cuda.Event()
 
-            e1.record()
-            cupy.cuda.runtime.memcpy(
-                images.data.ptr,
-                host_images.data.ptr,
-                host_images.nbytes,
-                cupy.cuda.runtime.memcpyHostToDevice,
-            )
-            e2.record()
+            with s2:
+                e1.record()
+                cupy.cuda.runtime.memcpyAsync(
+                    images.data.ptr,
+                    host_images.data.ptr,
+                    host_images.nbytes,
+                    cupy.cuda.runtime.memcpyHostToDevice,
+                    s2.ptr,
+                )
+                e2.record()
 
             e2.synchronize()
             t = cupy.cuda.get_elapsed_time(e1, e2)
