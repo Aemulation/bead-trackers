@@ -501,12 +501,12 @@ def test_tracker_measure_buffer_size(
             for _ in range(num_iters):
                 e1 = cupy.cuda.Event()
                 e1.record()
-                e2 = cupy.cuda.get_current_stream().record()
 
-                s2.wait_event(e2)
                 with s2:
+                    e2 = cupy.cuda.get_current_stream().record()
                     tracker.calculate(images)
 
+                s2.wait_event(e2)
                 e2.synchronize()
                 t = cupy.cuda.get_elapsed_time(e1, e2)
                 total_elapsed += t
@@ -558,8 +558,6 @@ def test_tracker_measure_transfer_time(
     for num_images in buffer_sizes:
         cupy.get_default_memory_pool().free_all_blocks()
         cupy.get_default_pinned_memory_pool().free_all_blocks()
-        print(camera_image.shape)
-        print(camera_image.nbytes)
         images = cupy.repeat(cupy.expand_dims(camera_image, axis=0), num_images, axis=0)
         host_images = np.zeros_like(images)
 
@@ -570,6 +568,7 @@ def test_tracker_measure_transfer_time(
         num_iters = 1000
         s2 = cupy.cuda.Stream()
 
+        assert images.nbytes == host_images.nbytes
         # Warmup
         for _ in range(10):
             cupy.cuda.runtime.memcpyAsync(
@@ -604,6 +603,7 @@ def test_tracker_measure_transfer_time(
         print(f"AVERAGE ELAPSED TO DEVICE: {total_elapsed / (num_iters - 1)}s")
         data["transfer_to_device"][num_images] = elapsed_times
 
+        assert host_z_values.nbytes == device_z_values.nbytes
         # Warmup
         for _ in range(10):
             cupy.cuda.runtime.memcpyAsync(
@@ -638,7 +638,7 @@ def test_tracker_measure_transfer_time(
         print(f"AVERAGE ELAPSED TO HOST: {total_elapsed / (num_iters - 1)}s")
         data["transfer_to_device"][num_images] = elapsed_times
 
-        data["parameters"] = {"buffer_size": num_images}
+        data["parameters"] = {"num_images": num_images, "buffer_size": images.nbytes}
 
         file_name = ",".join(
             [f"{key}={value}" for key, value in data["parameters"].items()]
