@@ -602,7 +602,6 @@ def test_tracker_measure_transfer_time(
             # print(f"ELAPSED: {t}ms")
             elapsed_times.append(t)
         print(f"AVERAGE ELAPSED TO DEVICE: {total_elapsed / num_iters}ms")
-        print(f"NUMPY AVERAGE ELAPSED TO DEVICE: {np.mean(np.array(elapsed_times))}ms")
         data["transfer_to_device"][num_images] = elapsed_times
 
         total_elapsed = 0
@@ -643,7 +642,6 @@ def test_tracker_measure_transfer_time(
             # print(f"ELAPSED: {t}ms")
             elapsed_times.append(t)
         print(f"AVERAGE ELAPSED TO HOST: {total_elapsed / num_iters}ms")
-        print(f"NUMPY AVERAGE ELAPSED TO HOST: {np.mean(np.array(elapsed_times))}ms")
         data["transfer_to_device"][num_images] = elapsed_times
 
         data["parameters"] = {"num_images": num_images, "buffer_size": images.nbytes}
