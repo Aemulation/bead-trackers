@@ -601,8 +601,13 @@ def test_tracker_measure_transfer_time(
             total_elapsed += t
             # print(f"ELAPSED: {t}s")
             elapsed_times.append(t)
-        print(f"AVERAGE ELAPSED TO DEVICE: {total_elapsed / (num_iters - 1)}s")
+        print(f"AVERAGE ELAPSED TO DEVICE: {total_elapsed / (num_iters)}s")
+        print(f"NUMPY AVERAGE ELAPSED TO DEVICE: {np.mean(np.array(elapsed_times))}")
         data["transfer_to_device"][num_images] = elapsed_times
+
+        total_elapsed = 0
+        num_iters = 1000
+        s2 = cupy.cuda.Stream()
 
         assert host_z_values.nbytes == device_z_values.nbytes
         # Warmup
@@ -637,7 +642,8 @@ def test_tracker_measure_transfer_time(
             total_elapsed += t
             # print(f"ELAPSED: {t}s")
             elapsed_times.append(t)
-        print(f"AVERAGE ELAPSED TO HOST: {total_elapsed / (num_iters - 1)}s")
+        print(f"AVERAGE ELAPSED TO HOST: {total_elapsed / (num_iters)}s")
+        print(f"NUMPY AVERAGE ELAPSED TO HOST: {np.mean(np.array(elapsed_times))}")
         data["transfer_to_device"][num_images] = elapsed_times
 
         data["parameters"] = {"num_images": num_images, "buffer_size": images.nbytes}
