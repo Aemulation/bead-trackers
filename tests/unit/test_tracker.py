@@ -458,8 +458,8 @@ def test_tracker_measure_buffer_size(
     for num_rois in num_roises:
         data = {}
         for num_images in buffer_sizes:
-            # cupy.get_default_memory_pool().free_all_blocks()
-            # cupy.get_default_pinned_memory_pool().free_all_blocks()
+            cupy.get_default_memory_pool().free_all_blocks()
+            cupy.get_default_pinned_memory_pool().free_all_blocks()
             images = cupy.repeat(
                 cupy.expand_dims(camera_image, axis=0), num_images, axis=0
             )
@@ -489,7 +489,6 @@ def test_tracker_measure_buffer_size(
 
             total_elapsed = 0
             num_iters = 1000
-            s2 = cupy.cuda.Stream()
 
             # Warmup
             for _ in range(10):
@@ -498,15 +497,14 @@ def test_tracker_measure_buffer_size(
             elapsed_times = []
             for _ in range(num_iters):
                 e1 = cupy.cuda.Event()
+                e2 = cupy.cuda.Event()
+
                 e1.record()
-
-                with s2:
-                    e2 = cupy.cuda.get_current_stream().record()
-                    tracker.calculate(images)
-
-                s2.wait_event(e2)
+                tracker.calculate(images)
+                e2.record()
                 e2.synchronize()
                 t = cupy.cuda.get_elapsed_time(e1, e2)
+
                 total_elapsed += t
                 print(f"ELAPSED: {t}s")
                 elapsed_times.append(t)
