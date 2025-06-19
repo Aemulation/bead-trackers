@@ -460,6 +460,8 @@ def test_tracker_measure_buffer_size(
     for num_rois in num_roises:
         data = {}
         for num_images in buffer_sizes:
+            cupy.get_default_memory_pool().free_all_blocks()
+            cupy.get_default_pinned_memory_pool().free_all_blocks()
             images = cupy.repeat(
                 cupy.expand_dims(camera_image, axis=0), num_images, axis=0
             )
@@ -554,6 +556,8 @@ def test_tracker_measure_transfer_time(
         "transfer_to_device": {},
     }
     for num_images in buffer_sizes:
+        cupy.get_default_memory_pool().free_all_blocks()
+        cupy.get_default_pinned_memory_pool().free_all_blocks()
         images = cupy.repeat(cupy.expand_dims(camera_image, axis=0), num_images, axis=0)
         host_images = np.zeros_like(images)
 
