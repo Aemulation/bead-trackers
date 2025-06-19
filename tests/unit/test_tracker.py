@@ -1,4 +1,5 @@
 import cupy
+import cupyx
 import numpy as np
 import pytest
 import json
@@ -507,10 +508,10 @@ def test_tracker_measure_buffer_size(
                 e2.synchronize()
                 t = cupy.cuda.get_elapsed_time(e1, e2)
                 total_elapsed += t
-                print(f"ELAPSED: {t}ms")
-                elapsed_times.append(total_elapsed)
+                print(f"ELAPSED: {t}s")
+                elapsed_times.append(t)
 
-            print(f"AVERAGE ELAPSED: {total_elapsed / (num_iters - 1)}ms")
+            print(f"AVERAGE ELAPSED: {total_elapsed / (num_iters - 1)}s")
             data[num_images] = elapsed_times
 
         data["parameters"] = {
@@ -544,12 +545,20 @@ def test_tracker_measure_transfer_time(
         500,
     ]
 
+    num_rois = 500
+
     pathlib.Path("test-results/data-transfer").mkdir(parents=True, exist_ok=True)
 
-    data = {}
+    data = {
+        "transfer_to_host": {},
+        "transfer_to_device": {},
+    }
     for num_images in buffer_sizes:
         images = cupy.repeat(cupy.expand_dims(camera_image, axis=0), num_images, axis=0)
         host_images = np.zeros_like(images)
+
+        host_z_values = cupyx.zeros_pinned((num_images, num_rois))
+        device_z_values = cupy.zeros_like(host_z_values)
 
         total_elapsed = 0
         num_iters = 1000
@@ -584,17 +593,40 @@ def test_tracker_measure_transfer_time(
             e2.synchronize()
             t = cupy.cuda.get_elapsed_time(e1, e2)
             total_elapsed += t
-            print(f"ELAPSED: {t}ms")
-            elapsed_times.append(total_elapsed)
+            print(f"ELAPSED: {t}s")
+            elapsed_times.append(t)
+        print(f"AVERAGE ELAPSED TO DEVICE: {total_elapsed / (num_iters - 1)}s")
+        data["transfer_to_device"][num_images] = elapsed_times
 
-        print(f"AVERAGE ELAPSED: {total_elapsed / (num_iters - 1)}ms")
-        data[num_images] = elapsed_times
+        elapsed_times = []
+        for _ in range(num_iters):
+            e1 = cupy.cuda.Event()
+            e1.record()
+            e2 = cupy.cuda.get_current_stream().record()
 
-    data["parameters"] = {}
+            s2.wait_event(e2)
+            with s2:
+                cupy.cuda.runtime.memcpyAsync(
+                    host_z_values.ctypes.data,
+                    device_z_values.data.ptr,
+                    device_z_values.nbytes,
+                    cupy.cuda.runtime.memcpyDeviceToHost,
+                    s2.ptr,
+                )
 
-    file_name = ",".join(
-        [f"{key}={value}" for key, value in data["parameters"].items()]
-    )
+            e2.synchronize()
+            t = cupy.cuda.get_elapsed_time(e1, e2)
+            total_elapsed += t
+            print(f"ELAPSED: {t}s")
+            elapsed_times.append(t)
+        print(f"AVERAGE ELAPSED TO HOST: {total_elapsed / (num_iters - 1)}s")
+        data["transfer_to_device"][num_images] = elapsed_times
 
-    with open(f"test-results/data-transfer/{file_name}.json", "w") as file:
-        json.dump(data, file)
+        data["parameters"] = {"buffer_size": num_images}
+
+        file_name = ",".join(
+            [f"{key}={value}" for key, value in data["parameters"].items()]
+        )
+
+        with open(f"test-results/data-transfer/{file_name}.json", "w") as file:
+            json.dump(data, file)
