@@ -315,8 +315,7 @@ def test_tracker_executor2():
     tracker_factory = TrackerFactoryClassRegistry.create(
         "qi_tracker", **QI_TRACKER_ARGUMENTS
     )
-    # camera_factory = CameraFactoryClassRegistry.create("dhyana2100")
-    camera_factory = None
+    camera_factory = CameraFactoryClassRegistry.create("dhyana2100")
 
     tracker_executor = TrackerExecutorController(
         camera_factory, tracker_factory, ROI_COORDINATES
