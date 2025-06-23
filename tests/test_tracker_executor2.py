@@ -292,18 +292,14 @@ class TrackerExecutorController:
 
 
 NUM_ROIS = 10
-# ROI_COORDINATES = cupy.array([[0, 0]] * NUM_ROIS, dtype=cupy.uint16)
-ROI_COORDINATES = np.array([[0, 0]] * NUM_ROIS, dtype=np.uint16)
+ROI_COORDINATES = cupy.array([[0, 0]] * NUM_ROIS, dtype=cupy.uint16)
 ROI_SIZE = 100
 
 QI_TRACKER_ARGUMENTS = {
     "num_images_per_buffer": 10,
-    # "roi_coordinates": ROI_COORDINATES,
-    "roi_coordinates": None,
+    "roi_coordinates": ROI_COORDINATES,
     "roi_size": ROI_SIZE,
-    # "zstacks": cupy.zeros([NUM_ROIS, 20, ROI_SIZE, ROI_SIZE], dtype=cupy.uint16),
-    # "zstacks": np.zeros([NUM_ROIS, 20, ROI_SIZE, ROI_SIZE], dtype=np.uint16),
-    "zstacks": None,
+    "zstacks": cupy.zeros([NUM_ROIS, 20, ROI_SIZE, ROI_SIZE], dtype=cupy.uint16),
     "number_of_qi_radial_steps": ROI_SIZE // 4,
     "number_of_qi_angle_steps": 100,
     "number_of_lut_radial_steps": 100,
