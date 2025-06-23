@@ -1,3 +1,4 @@
+from abc import abstractmethod
 import cupy
 import matplotlib.patches
 import matplotlib.pyplot as plt
@@ -14,6 +15,66 @@ from src.trackers.bead_tracker.center_of_mass import CenterOfMass
 from src.trackers.bead_tracker.quadrant_interpolation_tracker import (
     QuadrantInterpolationTracker,
 )
+
+from src.trackers.tracker_base import (
+    TrackerFactoryProtocol,
+    TrackerFactoryClassRegistry,
+)
+
+TRACKER_NAME = "qi_tracker"
+
+
+@TrackerFactoryClassRegistry.register(TRACKER_NAME)
+class TrackerFactory(TrackerFactoryProtocol):
+    def __init__(
+        self,
+        num_images_per_buffer: int,
+        roi_coordinates: cupy.ndarray,
+        roi_size: int,
+        zstacks: cupy.ndarray,
+        number_of_qi_radial_steps: int,
+        number_of_qi_angle_steps: int,
+        number_of_lut_radial_steps: int,
+        number_of_lut_angle_steps: int,
+        max_lut_radius: float | None = None,
+        max_qi_radius: float | None = None,
+        number_of_qi_iterations: int = 3,
+        min_lut_radius: float = 1,
+        min_qi_radius: float = 1,
+        **kwargs,
+    ) -> None:
+        super().__init__()
+
+        self.__num_images_per_buffer = num_images_per_buffer
+        self.__roi_coordinates = roi_coordinates
+        self.__roi_size = roi_size
+        self.__lookup_table_images = zstacks
+        self.__number_of_qi_radial_steps = number_of_qi_radial_steps
+        self.__number_of_qi_angle_steps = number_of_qi_angle_steps
+        self.__number_of_lut_radial_steps = number_of_lut_radial_steps
+        self.__number_of_lut_angle_steps = number_of_lut_angle_steps
+        self.__max_lut_radius = max_lut_radius or roi_size / 4
+        self.__max_qi_radius = max_qi_radius or roi_size / 4
+        self.__number_of_qi_iterations = number_of_qi_iterations
+        self.__min_lut_radius = min_lut_radius
+        self.__min_qi_radius = min_qi_radius
+
+    def create(self) -> TrackerProtocol:
+        return Tracker(
+            num_images_per_buffer=self.__num_images_per_buffer,
+            roi_coordinates=self.__roi_coordinates,
+            roi_size=self.__roi_size,
+            lookup_table_images=self.__lookup_table_images,
+            min_qi_radius=self.__min_qi_radius,
+            max_qi_radius=self.__max_qi_radius,
+            number_of_qi_radial_steps=self.__number_of_qi_radial_steps,
+            number_of_qi_angle_steps=self.__number_of_qi_angle_steps,
+            number_of_qi_iterations=self.__number_of_qi_iterations,
+            min_lut_radius=self.__min_lut_radius,
+            max_lut_radius=self.__max_lut_radius,
+            number_of_lut_radial_steps=self.__number_of_lut_radial_steps,
+            number_of_lut_angle_steps=self.__number_of_lut_angle_steps,
+        )
 
 
 class Tracker(TrackerProtocol):
@@ -32,8 +93,6 @@ class Tracker(TrackerProtocol):
         max_lut_radius: float,
         number_of_lut_radial_steps: int,
         number_of_lut_angle_steps: int,
-        *args,
-        **kwargs,
     ) -> None:
         assert lookup_table_images.shape[0] == roi_coordinates.shape[0]
         num_rois = roi_coordinates.shape[0]
