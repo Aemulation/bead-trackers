@@ -155,9 +155,9 @@ class TrackerExecutorWorker:
                 self.__stream1.ptr,
             )
             cupy.cuda.runtime.memcpyAsync(
-                self.__host_z_values_buffer2,
-                device_z_values_buffer2.ctypes.data,
-                device_z_values_buffer2.ctypes.nbytes,
+                self.__host_z_values_buffer2.ctypes.data,
+                device_z_values_buffer2.data.ptr,
+                device_z_values_buffer2.nbytes,
                 cupy.cuda.runtime.memcpyDeviceToHost,
                 self.__stream1.ptr,
             )
@@ -191,9 +191,9 @@ class TrackerExecutorWorker:
                 )
                 self.__stream1.wait_event(transfer_coordinates_done_event)
                 cupy.cuda.runtime.memcpyAsync(
-                    self.__host_z_values_buffer2,
-                    device_z_values_buffer2.ctypes.data,
-                    device_z_values_buffer2.ctypes.nbytes,
+                    self.__host_z_values_buffer1.ctypes.data,
+                    device_z_values_buffer1.data.ptr,
+                    device_z_values_buffer1.nbytes,
                     cupy.cuda.runtime.memcpyDeviceToHost,
                     self.__stream1.ptr,
                 )
