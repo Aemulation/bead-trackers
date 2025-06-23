@@ -65,6 +65,10 @@ class TrackerExecutorWorker:
         self.__camera = self.__camera_factory.create()
 
         self.__camera.open()
+        self.__camera.set_height(2016)
+        self.__camera.set_width(2560)
+        self.__camera.set_framerate(975)
+
         frame_height = self.__camera.get_height()
         frame_width = self.__camera.get_width()
         frame_size = self.__camera.get_frame_size()
