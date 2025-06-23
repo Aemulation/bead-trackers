@@ -44,8 +44,6 @@ class TrackerFactory(TrackerFactoryProtocol):
         min_qi_radius: float = 1,
         **kwargs,
     ) -> None:
-        super().__init__()
-
         self.__num_images_per_buffer = num_images_per_buffer
         self.__roi_coordinates = roi_coordinates
         self.__roi_size = roi_size
@@ -65,7 +63,7 @@ class TrackerFactory(TrackerFactoryProtocol):
             num_images_per_buffer=self.__num_images_per_buffer,
             roi_coordinates=cupy.array(self.__roi_coordinates),
             roi_size=self.__roi_size,
-            lookup_table_images=np.array(self.__lookup_table_images),
+            lookup_table_images=cupy.array(self.__lookup_table_images),
             min_qi_radius=self.__min_qi_radius,
             max_qi_radius=self.__max_qi_radius,
             number_of_qi_radial_steps=self.__number_of_qi_radial_steps,

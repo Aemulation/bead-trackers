@@ -22,8 +22,8 @@ class TrackerProtocol(Protocol):
 
 
 class TrackerFactoryProtocol(Protocol):
-    def __init__(self, **kwargs) -> None:
-        super().__init__()
+    @abstractmethod
+    def __init__(self, **kwargs) -> None: ...
 
     @abstractmethod
     def create(self) -> TrackerProtocol: ...
