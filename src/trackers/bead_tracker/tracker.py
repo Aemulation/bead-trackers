@@ -1,5 +1,6 @@
 from abc import abstractmethod
 import cupy
+import numpy as np
 import matplotlib.patches
 import matplotlib.pyplot as plt
 import time
@@ -29,9 +30,9 @@ class TrackerFactory(TrackerFactoryProtocol):
     def __init__(
         self,
         num_images_per_buffer: int,
-        roi_coordinates: cupy.ndarray,
+        roi_coordinates: np.ndarray,
         roi_size: int,
-        zstacks: cupy.ndarray,
+        zstacks: np.ndarray,
         number_of_qi_radial_steps: int,
         number_of_qi_angle_steps: int,
         number_of_lut_radial_steps: int,
@@ -62,9 +63,9 @@ class TrackerFactory(TrackerFactoryProtocol):
     def create(self) -> TrackerProtocol:
         return Tracker(
             num_images_per_buffer=self.__num_images_per_buffer,
-            roi_coordinates=self.__roi_coordinates,
+            roi_coordinates=cupy.array(self.__roi_coordinates),
             roi_size=self.__roi_size,
-            lookup_table_images=self.__lookup_table_images,
+            lookup_table_images=np.array(self.__lookup_table_images),
             min_qi_radius=self.__min_qi_radius,
             max_qi_radius=self.__max_qi_radius,
             number_of_qi_radial_steps=self.__number_of_qi_radial_steps,
