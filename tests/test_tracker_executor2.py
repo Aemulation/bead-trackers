@@ -261,6 +261,7 @@ class TrackerExecutorController:
             if not self.__controller_to_worker_pipe.poll(timeout=0.1):
                 if not self.__running:
                     break
+                time.sleep(0.1)
                 continue
 
             (tracker_executor_controller_command, data) = (
