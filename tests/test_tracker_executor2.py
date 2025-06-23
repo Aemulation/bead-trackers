@@ -292,7 +292,7 @@ class TrackerExecutorController:
 
 
 NUM_ROIS = 10
-ROI_COORDINATES = cupy.array([[0, 0]] * NUM_ROIS, dtype=cupy.uint16)
+ROI_COORDINATES = np.array([[0, 0]] * NUM_ROIS, dtype=cupy.uint16)
 ROI_SIZE = 100
 
 QI_TRACKER_ARGUMENTS = {
@@ -314,7 +314,7 @@ def test_tracker_executor2():
     camera_factory = CameraFactoryClassRegistry.create("dhyana2100")
 
     tracker_executor = TrackerExecutorController(
-        camera_factory, tracker_factory, ROI_COORDINATES.get()
+        camera_factory, tracker_factory, ROI_COORDINATES
     )
 
     print("STARTING TRACKER EXECUTOR")
