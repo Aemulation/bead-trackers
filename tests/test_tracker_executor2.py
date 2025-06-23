@@ -268,7 +268,7 @@ class TrackerExecutorWorker:
                 self.__stop()
                 return
             else:
-                print(f"Received unknown command: {command}")
+                print(f"Worker received unknown command: {command}")
 
     def __start(self):
         with self.__running_lock:
@@ -325,6 +325,8 @@ class TrackerExecutorController:
             if command == TrackerExecutorControllerCommand.Image:
                 image = cast(np.ndarray, data)
                 pub.sendMessage(IMAGE_TOPIC, image=image)
+            else:
+                print(f"Controller received unknown command: {command}")
 
     def start(self):
         with self.__running_lock:
