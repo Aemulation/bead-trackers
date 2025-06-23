@@ -251,7 +251,7 @@ class TrackerExecutorController:
             target=self.__run_communication, args=()
         )
 
-        # multiprocessing.set_start_method("spawn")
+        multiprocessing.set_start_method("spawn")
         self.__worker_process = multiprocessing.Process(
             target=self.__worker.run, args=(self.__worker_to_controller_pipe,)
         )
