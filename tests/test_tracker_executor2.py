@@ -29,7 +29,7 @@ from cameras.camera_protocol import (
 IMAGE_TOPIC = "TrackerExecutorImageTopic"
 
 # TODO: Only used for testing. Remove later and make configurable.
-BUFFER_SIZE = 10
+BUFFER_SIZE = 300
 
 
 class TrackerExecutorWorkerCommand(Enum):
