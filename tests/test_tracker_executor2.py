@@ -228,8 +228,9 @@ class TrackerExecutorWorker:
 
         self.__tracker_thread.join()
 
-        # TODO:
-        # self.__camera.close()
+        # TODO: Remove
+        print(f"LOST FRAMES: {self.__camera.get_lost_frames()}")
+        self.__camera.close()
 
 
 class TrackerExecutorController:
