@@ -122,6 +122,8 @@ class TrackerExecutorWorker:
             return cupy.uint16
 
     def __run_tracker(self):
+        transfer_done_event = cupy.cuda.Event()
+
         self.__camera.start_recording()
         host_images_buffer1 = self.__camera.get_next_buffer()
         cupy.cuda.runtime.memcpyAsync(
@@ -131,6 +133,8 @@ class TrackerExecutorWorker:
             cupy.cuda.runtime.memcpyHostToDevice,
             self.__stream1.ptr,
         )
+        with self.__stream1:
+            transfer_done_event.record()
 
         while True:
             if self.__running_lock.acquire(blocking=False):
@@ -139,10 +143,9 @@ class TrackerExecutorWorker:
                 if not running:
                     break
 
-            # TODO: Wait for transfer completion using events.
             # TODO: Copy z values to host
-            # TODO: Ignore first z values
             with self.__stream2:
+                self.__stream2.wait_event(transfer_done_event)
                 self.__tracker1.calculate(self.__device_frame_buffer1)
                 device_z_values_buffer1 = self.__tracker1.get_calculated_z()
 
@@ -158,9 +161,9 @@ class TrackerExecutorWorker:
                 self.__stream1.ptr,
             )
 
-            # TODO: Wait for transfer completion using events.
             # TODO: Copy z values to host
             with self.__stream2:
+                self.__stream2.wait_event(transfer_done_event)
                 self.__tracker2.calculate(self.__device_frame_buffer2)
                 device_z_values_buffer2 = self.__tracker2.get_calculated_z()
 
