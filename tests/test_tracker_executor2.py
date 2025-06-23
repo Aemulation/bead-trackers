@@ -261,13 +261,9 @@ class TrackerExecutorController:
                 time.sleep(0.1)
                 continue
 
-            (tracker_executor_controller_command, data) = (
-                self.__controller_to_worker_pipe.recv()
-            )
-            if (
-                tracker_executor_controller_command
-                == TrackerExecutorControllerCommand.Image
-            ):
+            (command, data) = self.__controller_to_worker_pipe.recv()
+            print(f"Controller got command: {command}")
+            if command == TrackerExecutorControllerCommand.Image:
                 image = cast(np.ndarray, data)
                 pub.sendMessage(IMAGE_TOPIC, image=image)
 
