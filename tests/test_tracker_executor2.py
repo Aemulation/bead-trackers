@@ -234,7 +234,9 @@ class TrackerExecutorWorker:
                 transfer_frames_done_event.record()
                 transfer_coordinates_done_event.record()
 
+        print("CAMERA STOPPING RECORDING")
         self.__camera.stop_recording()
+        print("CAMERA HAS STOPPED RECORDING")
 
     def run(
         self,
@@ -281,7 +283,6 @@ class TrackerExecutorWorker:
 
         # TODO: Remove
         print(f"LOST FRAMES: {self.__camera.get_lost_frames()}")
-        self.__camera.close()
 
 
 class TrackerExecutorController:
