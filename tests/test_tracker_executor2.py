@@ -160,6 +160,8 @@ class TrackerExecutorWorker:
                 cupy.cuda.runtime.memcpyHostToDevice,
                 self.__stream1.ptr,
             )
+            with self.__stream1:
+                transfer_done_event.record()
 
             # TODO: Copy z values to host
             with self.__stream2:
@@ -178,6 +180,8 @@ class TrackerExecutorWorker:
                 cupy.cuda.runtime.memcpyHostToDevice,
                 self.__stream1.ptr,
             )
+            with self.__stream1:
+                transfer_done_event.record()
 
         self.__camera.stop_recording()
 
