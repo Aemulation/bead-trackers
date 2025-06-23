@@ -325,7 +325,7 @@ def test_tracker_executor2():
     tracker_executor.start()
 
     print("SLEEPING")
-    time.sleep(3)
+    time.sleep(30)
     print("WOKE-UP")
 
     print("STOPPING TRACKER EXECUTOR")
