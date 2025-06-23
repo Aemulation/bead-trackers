@@ -145,7 +145,6 @@ class TrackerExecutorWorker:
             transfer_frames_done_event.record()
         # TODO: Copy z values to host
         with self.__stream2:
-            self.__stream2.wait_event(transfer_frames_done_event)
             self.__tracker2.calculate(self.__device_frame_buffer2)
             transfer_coordinates_done_event.record()
             device_z_values_buffer2 = self.__tracker2.get_calculated_z()
