@@ -146,7 +146,7 @@ class TrackerExecutorWorker:
         # TODO: Copy z values to host
         with self.__stream2:
             self.__tracker2.calculate(self.__device_frame_buffer2)
-            transfer_coordinates_done_event.record()
+            # transfer_coordinates_done_event.record()
             device_z_values_buffer2 = self.__tracker2.get_calculated_z()
 
         host_images_buffer1 = self.__camera.get_next_buffer()
@@ -178,7 +178,7 @@ class TrackerExecutorWorker:
             with self.__stream2:
                 self.__stream2.wait_event(transfer_frames_done_event)
                 self.__tracker1.calculate(self.__device_frame_buffer1)
-                transfer_coordinates_done_event.record()
+                # transfer_coordinates_done_event.record()
                 device_z_values_buffer1 = self.__tracker1.get_calculated_z()
 
             self.__controller_pipe.send(
@@ -203,7 +203,7 @@ class TrackerExecutorWorker:
                     self.__stream1.ptr,
                 )
                 transfer_frames_done_event.record()
-                transfer_coordinates_done_event.record()
+                # transfer_coordinates_done_event.record()
 
             with self.__stream2:
                 self.__stream2.wait_event(transfer_frames_done_event)
@@ -232,7 +232,7 @@ class TrackerExecutorWorker:
                     self.__stream1.ptr,
                 )
                 transfer_frames_done_event.record()
-                transfer_coordinates_done_event.record()
+                # transfer_coordinates_done_event.record()
 
         self.__camera.stop_recording()
 
