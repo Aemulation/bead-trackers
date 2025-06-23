@@ -359,12 +359,18 @@ QI_TRACKER_ARGUMENTS = {
     "number_of_lut_angle_steps": 100,
 }
 
+CAMERA_ARGUMENTS = {
+    "camera_index": 0,
+    "enable_fan": False,
+    "number_of_copy_threads_per_buffer": 1,
+}
+
 
 def test_tracker_executor2():
     tracker_factory = TrackerFactoryClassRegistry.create(
         "qi_tracker", **QI_TRACKER_ARGUMENTS
     )
-    camera_factory = CameraFactoryClassRegistry.create("dhyana2100")
+    camera_factory = CameraFactoryClassRegistry.create("dhyana2100", **CAMERA_ARGUMENTS)
 
     tracker_executor = TrackerExecutorController(
         camera_factory, tracker_factory, ROI_COORDINATES
