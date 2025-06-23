@@ -28,6 +28,9 @@ from cameras.camera_protocol import (
 
 IMAGE_TOPIC = "TrackerExecutorImageTopic"
 
+# TODO: Only used for testing. Remove later and make configurable.
+BUFFER_SIZE = 10
+
 
 class TrackerExecutorWorkerCommand(Enum):
     Start = 1
@@ -192,7 +195,7 @@ class TrackerExecutorWorker:
         self.__running_lock = threading.Lock()
 
         # TODO: Make configurable
-        self.__setup_tracking(200, 5, self.__roi_coordinates)
+        self.__setup_tracking(BUFFER_SIZE, 5, self.__roi_coordinates)
 
         self.__tracker_thread = threading.Thread(target=self.__run_tracker)
 
@@ -296,7 +299,7 @@ ROI_COORDINATES = cupy.array([[0, 0]] * NUM_ROIS, dtype=cupy.uint32)
 ROI_SIZE = 100
 
 QI_TRACKER_ARGUMENTS = {
-    "num_images_per_buffer": 10,
+    "num_images_per_buffer": BUFFER_SIZE,
     "roi_coordinates": ROI_COORDINATES,
     "roi_size": ROI_SIZE,
     "zstacks": cupy.zeros([NUM_ROIS, 20, ROI_SIZE, ROI_SIZE], dtype=cupy.uint16),
