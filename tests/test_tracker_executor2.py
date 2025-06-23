@@ -26,7 +26,6 @@ from cameras.camera_protocol import (
     CameraProtocol,
 )
 
-IMAGE_TOPIC = "TrackerExecutorImageTopic"
 
 # TODO: Only used for testing. Remove later and make configurable.
 BUFFER_SIZE = 300
@@ -286,6 +285,8 @@ class TrackerExecutorWorker:
 
 
 class TrackerExecutorController:
+    IMAGE_TOPIC = "TrackerExecutorImageTopic"
+
     def __init__(
         self,
         camera_factory: CameraFactoryProtocol,
@@ -324,7 +325,7 @@ class TrackerExecutorController:
             print(f"Controller got command: {command}")
             if command == TrackerExecutorControllerCommand.Image:
                 image = cast(np.ndarray, data)
-                pub.sendMessage(IMAGE_TOPIC, image=image)
+                pub.sendMessage(self.IMAGE_TOPIC, image=image)
             else:
                 print(f"Controller received unknown command: {command}")
 
