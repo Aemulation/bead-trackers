@@ -1,15 +1,20 @@
 [project]
-name = "bead-trackers"
+name = "bead_trackers"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "cupy",
- "numpy==2.2.0",
- "pip>=25.1.1",
- "pytest>=8.4.0",
+    "numpy==2.2.0",
+    "pip>=25.1.1",
+    "pypubsub>=4.0.3",
+    "pytest>=8.4.0",
 ]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["test*"]
 
 [tool.uv.sources]
 cupy = { path = "../cupy" }
