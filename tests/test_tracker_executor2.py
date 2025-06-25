@@ -48,10 +48,17 @@ class TrackerExecutorWorker:
         camera_factory: CameraFactoryProtocol,
         tracker_factory: TrackerFactoryProtocol,
         roi_coordinates: np.ndarray,
+        frame_height: int,
+        frame_width: int,
+        framerate: int,
     ):
         self.__camera_factory = camera_factory
         self.__tracker_factory = tracker_factory
         self.__roi_coordinates = roi_coordinates
+
+        self.__frame_height = frame_height
+        self.__frame_width = frame_width
+        self.__framerate = framerate
 
     def __setup_tracking(
         self,
@@ -64,9 +71,9 @@ class TrackerExecutorWorker:
         self.__camera = self.__camera_factory.create()
 
         self.__camera.open()
-        self.__camera.set_height(2016)
-        self.__camera.set_width(2560)
-        self.__camera.set_framerate(975)
+        self.__camera.set_height(self.__frame_height)
+        self.__camera.set_width(self.__frame_width)
+        self.__camera.set_framerate(self.__framerate)
 
         frame_height = self.__camera.get_height()
         frame_width = self.__camera.get_width()
@@ -276,7 +283,12 @@ class TrackerExecutorController:
         )
 
         self.__worker = TrackerExecutorWorker(
-            camera_factory, tracker_factory, roi_coordinates
+            camera_factory,
+            tracker_factory,
+            roi_coordinates,
+            frame_height=2016,
+            frame_width=2560,
+            framerate=970,
         )
 
         self.__running = False
