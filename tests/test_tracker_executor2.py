@@ -133,6 +133,15 @@ class TrackerExecutorWorker:
         self.__camera.start_recording()
 
         host_images_buffer1 = self.__camera.get_next_buffer()
+        with self.__stream1:
+            cupy.cuda.runtime.memcpyAsync(
+                self.__device_frame_buffer1.data.ptr,
+                host_images_buffer1.ctypes.data,
+                host_images_buffer1.nbytes,
+                cupy.cuda.runtime.memcpyHostToDevice,
+                self.__stream1.ptr,
+            )
+            transfer_frames_done_event.record()
 
         while True:
             if self.__running_lock.acquire(blocking=False):
