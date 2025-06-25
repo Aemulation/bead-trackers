@@ -132,40 +132,7 @@ class TrackerExecutorWorker:
 
         self.__camera.start_recording()
 
-        host_images_buffer2 = self.__camera.get_next_buffer()
-        with self.__stream1:
-            cupy.cuda.runtime.memcpyAsync(
-                self.__device_frame_buffer2.data.ptr,
-                host_images_buffer2.ctypes.data,
-                host_images_buffer2.nbytes,
-                cupy.cuda.runtime.memcpyHostToDevice,
-                self.__stream1.ptr,
-            )
-            transfer_frames_done_event.record()
-        # TODO: Copy z values to host
-        with self.__stream2:
-            self.__tracker2.calculate(self.__device_frame_buffer2)
-            transfer_coordinates_done_event.record()
-            device_z_values_buffer2 = self.__tracker2.get_calculated_z()
-
         host_images_buffer1 = self.__camera.get_next_buffer()
-        with self.__stream1:
-            cupy.cuda.runtime.memcpyAsync(
-                self.__device_frame_buffer1.data.ptr,
-                host_images_buffer1.ctypes.data,
-                host_images_buffer1.nbytes,
-                cupy.cuda.runtime.memcpyHostToDevice,
-                self.__stream1.ptr,
-            )
-            cupy.cuda.runtime.memcpyAsync(
-                self.__host_z_values_buffer2.ctypes.data,
-                device_z_values_buffer2.data.ptr,
-                device_z_values_buffer2.nbytes,
-                cupy.cuda.runtime.memcpyDeviceToHost,
-                self.__stream1.ptr,
-            )
-            self.__stream1.wait_event(transfer_coordinates_done_event)
-            transfer_frames_done_event.record()
 
         while True:
             if self.__running_lock.acquire(blocking=False):
@@ -247,8 +214,6 @@ class TrackerExecutorWorker:
         # TODO: Make configurable
         self.__setup_tracking(BUFFER_SIZE, 5, self.__roi_coordinates)
 
-        self.__tracker_thread = threading.Thread(target=self.__run_tracker)
-
         self.__run_communication()
 
         self.__teardown_tracking()
@@ -269,11 +234,17 @@ class TrackerExecutorWorker:
 
     def __start(self):
         with self.__running_lock:
+            if self.__running:
+                return
             self.__running = True
+
+        self.__tracker_thread = threading.Thread(target=self.__run_tracker)
         self.__tracker_thread.start()
 
     def __stop(self):
         with self.__running_lock:
+            if not self.__running:
+                return
             self.__running = False
 
         self.__tracker_thread.join()
