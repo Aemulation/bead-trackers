@@ -338,13 +338,13 @@ class TrackerExecutorController:
 
     def __run_communication(self):
         while True:
-            if self.__controller_to_worker_queue.empty():
+            if self.__worker_to_controller_queue.empty():
                 if not self.__running:
                     break
                 time.sleep(0.1)
                 continue
 
-            (command, data) = self.__controller_to_worker_queue.get()
+            (command, data) = self.__worker_to_controller_queue.get()
             print(f"Controller got command: {command}")
             if command == TrackerExecutorControllerCommand.Image:
                 image = cast(np.ndarray, data)
