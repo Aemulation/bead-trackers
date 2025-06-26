@@ -158,12 +158,7 @@ class TrackerExecutorWorker:
         # TODO: Can we expand this pre-loop code so it contains valid data?
         device_z_values_buffer2 = self.__tracker2.get_calculated_z()
 
-        while True:
-            print("Worker grabbing lock...")
-            if not self.__keep_running.is_set():
-                print("Worker tracker not running anymore")
-                break
-
+        while self.__keep_running.is_set():
             with self.__stream2:
                 self.__stream2.wait_event(transfer_frames_done_event2)
                 transfer_frames_done_event2 = cupy.cuda.Event(disable_timing=True)
