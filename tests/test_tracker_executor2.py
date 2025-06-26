@@ -105,9 +105,6 @@ class TrackerExecutorWorker:
         self.__tracker1 = self.__tracker_factory.create()
         self.__tracker2 = self.__tracker_factory.create()
 
-        self.__stream1 = cupy.cuda.Stream(non_blocking=True)
-        self.__stream2 = cupy.cuda.Stream(non_blocking=True)
-
         self.__host_z_values_buffer1 = cupyx.zeros_pinned(
             (buffer_size, num_rois), dtype=cupy.float32
         )
@@ -134,6 +131,9 @@ class TrackerExecutorWorker:
             return cupy.uint16
 
     def __run_tracker(self):
+        stream1 = cupy.cuda.Stream(non_blocking=True)
+        stream2 = cupy.cuda.Stream(non_blocking=True)
+
         transfer_frames_done_event1 = cupy.cuda.Event(disable_timing=True)
         transfer_frames_done_event2 = cupy.cuda.Event(disable_timing=True)
         transfer_coordinates_done_event1 = cupy.cuda.Event(disable_timing=True)
@@ -142,15 +142,15 @@ class TrackerExecutorWorker:
         self.__camera.start_recording()
 
         host_images_buffer1 = self.__camera.get_next_buffer()
-        self.__stream1.synchronize()
-        self.__stream2.synchronize()
-        with self.__stream1:
+        stream1.synchronize()
+        stream2.synchronize()
+        with stream1:
             cupy.cuda.runtime.memcpyAsync(
                 self.__device_frame_buffer1.data.ptr,
                 host_images_buffer1.ctypes.data,
                 host_images_buffer1.nbytes,
                 cupy.cuda.runtime.memcpyHostToDevice,
-                self.__stream1.ptr,
+                stream1.ptr,
             )
             transfer_frames_done_event1.record()
 
@@ -176,19 +176,19 @@ class TrackerExecutorWorker:
                 )
             )
             # TODO: Send y,x and z coordinates from buffer 2 to controller.
-            self.__stream1.wait_event(transfer_coordinates_done_event1)
+            stream1.wait_event(transfer_coordinates_done_event1)
             transfer_coordinates_done_event1 = cupy.cuda.Event(disable_timing=True)
 
             host_images_buffer2 = self.__camera.get_next_buffer()
-            self.__stream1.synchronize()
-            self.__stream2.synchronize()
-            with self.__stream1:
+            stream1.synchronize()
+            stream2.synchronize()
+            with stream1:
                 cupy.cuda.runtime.memcpyAsync(
                     self.__device_frame_buffer2.data.ptr,
                     host_images_buffer2.ctypes.data,
                     host_images_buffer2.nbytes,
                     cupy.cuda.runtime.memcpyHostToDevice,
-                    self.__stream1.ptr,
+                    stream1.ptr,
                 )
                 transfer_frames_done_event2.record()
                 cupy.cuda.runtime.memcpyAsync(
@@ -196,7 +196,7 @@ class TrackerExecutorWorker:
                     device_z_values_buffer1.data.ptr,
                     device_z_values_buffer1.nbytes,
                     cupy.cuda.runtime.memcpyDeviceToHost,
-                    self.__stream1.ptr,
+                    stream1.ptr,
                 )
                 transfer_coordinates_done_event1.record()
 
@@ -213,19 +213,19 @@ class TrackerExecutorWorker:
                 (TrackerExecutorControllerCommand.ZCoordinates, device_z_values_buffer1)
             )
             # TODO: Send y,x and z coordinates to controller.
-            self.__stream1.wait_event(transfer_coordinates_done_event2)
+            stream1.wait_event(transfer_coordinates_done_event2)
             transfer_coordinates_done_event2 = cupy.cuda.Event(disable_timing=True)
 
             host_images_buffer1 = self.__camera.get_next_buffer()
-            self.__stream1.synchronize()
-            self.__stream2.synchronize()
-            with self.__stream1:
+            stream1.synchronize()
+            stream2.synchronize()
+            with stream1:
                 cupy.cuda.runtime.memcpyAsync(
                     self.__device_frame_buffer1.data.ptr,
                     host_images_buffer1.ctypes.data,
                     host_images_buffer1.nbytes,
                     cupy.cuda.runtime.memcpyHostToDevice,
-                    self.__stream1.ptr,
+                    stream1.ptr,
                 )
                 transfer_frames_done_event1.record()
                 cupy.cuda.runtime.memcpyAsync(
@@ -233,7 +233,7 @@ class TrackerExecutorWorker:
                     device_z_values_buffer2.data.ptr,
                     device_z_values_buffer2.nbytes,
                     cupy.cuda.runtime.memcpyDeviceToHost,
-                    self.__stream1.ptr,
+                    stream1.ptr,
                 )
                 transfer_coordinates_done_event2.record()
             print("Tracker reached end of for loop")
