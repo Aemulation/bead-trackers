@@ -242,7 +242,9 @@ class TrackerExecutorWorker:
                 )
                 transfer_coordinates_done_event2.record()
 
+        print("Worker stopping camera")
         self.__camera.stop_recording()
+        print("Worker done tracking")
 
     def run(
         self,
@@ -267,12 +269,14 @@ class TrackerExecutorWorker:
             command = self.__controller_pipe.recv()
 
             if command == TrackerExecutorWorkerCommand.Start:
+                print("Worker starting...")
                 self.__start()
             elif command == TrackerExecutorWorkerCommand.Stop:
+                print("Worker stopping...")
                 self.__stop()
                 return
             else:
-                print(f"Worker received unknown command: {command}")
+                print(f"Worker received unsupported command: {command}")
 
     def __start(self):
         with self.__running_lock:
@@ -289,6 +293,7 @@ class TrackerExecutorWorker:
                 return
             self.__running = False
 
+        print("Worker joining tracker thread")
         self.__tracker_thread.join()
 
         # TODO: Remove
@@ -297,6 +302,7 @@ class TrackerExecutorWorker:
 
 class TrackerExecutorController:
     IMAGE_TOPIC = "TrackerExecutorImageTopic"
+    Z_VALUES_TOPIC = "TrackerExecutorZValuesTopic"
 
     def __init__(
         self,
@@ -342,8 +348,12 @@ class TrackerExecutorController:
             if command == TrackerExecutorControllerCommand.Image:
                 image = cast(np.ndarray, data)
                 pub.sendMessage(self.IMAGE_TOPIC, image=image)
+            elif command == TrackerExecutorControllerCommand.ZCoordinates:
+                image = cast(np.ndarray, data)
+                pub.sendMessage(self.Z_VALUES_TOPIC, image=image)
             else:
-                print(f"Controller received unknown command: {command}")
+                print(f"Controller received unsupported command: {command}")
+        print("Controller communication is done")
 
     def start(self):
         with self.__running_lock:
