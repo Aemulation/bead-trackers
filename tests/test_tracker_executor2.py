@@ -131,6 +131,7 @@ class TrackerExecutorWorker:
             return cupy.uint16
 
     def __run_tracker(self):
+        cupy.cuda.Device().use()
         stream1 = cupy.cuda.Stream(non_blocking=True)
         stream2 = cupy.cuda.Stream(non_blocking=True)
 
@@ -160,8 +161,8 @@ class TrackerExecutorWorker:
 
         while self.__keep_running.is_set():
             print("Tracker starting while loop")
-            with self.__stream2:
-                self.__stream2.wait_event(transfer_frames_done_event2)
+            with stream2:
+                stream2.wait_event(transfer_frames_done_event2)
                 transfer_frames_done_event2 = cupy.cuda.Event(disable_timing=True)
                 self.__tracker1.calculate(self.__device_frame_buffer1)
                 device_z_values_buffer1 = self.__tracker1.get_calculated_z()
@@ -200,8 +201,8 @@ class TrackerExecutorWorker:
                 )
                 transfer_coordinates_done_event1.record()
 
-            with self.__stream2:
-                self.__stream2.wait_event(transfer_frames_done_event1)
+            with stream2:
+                stream2.wait_event(transfer_frames_done_event1)
                 transfer_frames_done_event1 = cupy.cuda.Event(disable_timing=True)
                 self.__tracker2.calculate(self.__device_frame_buffer2)
                 device_z_values_buffer2 = self.__tracker2.get_calculated_z()
