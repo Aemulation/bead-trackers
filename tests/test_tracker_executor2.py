@@ -244,6 +244,7 @@ class TrackerExecutorWorker:
         print("Worker stopping camera")
         self.__camera.stop_recording()
         print("Worker done tracking")
+        self.__tracker_done.set()
 
     def run(
         self,
@@ -251,6 +252,7 @@ class TrackerExecutorWorker:
     ):
         self.__controller_pipe = controller_pipe
         self.__keep_running = threading.Event()
+        self.__tracker_done = threading.Event()
 
         # TODO: Make configurable
         self.__setup_tracking(BUFFER_SIZE, 5, self.__roi_coordinates)
@@ -279,6 +281,7 @@ class TrackerExecutorWorker:
         if self.__keep_running.is_set():
             return
         self.__keep_running.set()
+        self.__tracker_done.clear()
 
         self.__tracker_thread = threading.Thread(target=self.__run_tracker)
         self.__tracker_thread.start()
@@ -288,7 +291,8 @@ class TrackerExecutorWorker:
             return
         self.__keep_running.clear()
 
-        time.sleep(3)
+        print("Waiting for tracker to be done")
+        self.__tracker_done.wait()
         print("Worker joining tracker thread")
         self.__tracker_thread.join()
 
