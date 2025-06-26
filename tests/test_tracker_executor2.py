@@ -245,7 +245,7 @@ class TrackerExecutorWorker:
 
     def run(
         self,
-        controller_pipe: Connection,
+        controller_pipe: multiprocessing.Queue,
     ):
         self.__controller_pipe = controller_pipe
         self.__keep_running = threading.Event()
@@ -260,9 +260,9 @@ class TrackerExecutorWorker:
 
     def __run_communication(self):
         while True:
-            while not self.__controller_pipe.poll():
+            while self.__controller_pipe.empty():
                 time.sleep(0.1)
-            command = self.__controller_pipe.recv()
+            command = self.__controller_pipe.get()
 
             if command == TrackerExecutorWorkerCommand.Start:
                 print("Worker starting...")
