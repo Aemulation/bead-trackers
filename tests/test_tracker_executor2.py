@@ -60,6 +60,8 @@ class TrackerExecutorWorker:
         self.__frame_width = frame_width
         self.__framerate = framerate
 
+        self.__keep_running = threading.Event()
+
     def __setup_tracking(
         self,
         buffer_size: int,
@@ -160,12 +162,9 @@ class TrackerExecutorWorker:
 
         while True:
             print("Worker grabbing lock...")
-            if self.__running_lock.acquire(blocking=False):
-                running = self.__running
-                self.__running_lock.release()
-                if not running:
-                    print("Worker tracker not running anymore")
-                    break
+            if not self.__keep_running.is_set():
+                print("Worker tracker not running anymore")
+                break
 
             with self.__stream2:
                 self.__stream2.wait_event(transfer_frames_done_event2)
@@ -254,9 +253,6 @@ class TrackerExecutorWorker:
     ):
         self.__controller_pipe = controller_pipe
 
-        self.__running = False
-        self.__running_lock = threading.Lock()
-
         # TODO: Make configurable
         self.__setup_tracking(BUFFER_SIZE, 5, self.__roi_coordinates)
 
@@ -281,19 +277,17 @@ class TrackerExecutorWorker:
                 print(f"Worker received unsupported command: {command}")
 
     def __start(self):
-        with self.__running_lock:
-            if self.__running:
-                return
-            self.__running = True
+        if self.__keep_running.is_set():
+            return
+        self.__keep_running.set()
 
         self.__tracker_thread = threading.Thread(target=self.__run_tracker)
         self.__tracker_thread.start()
 
     def __stop(self):
-        with self.__running_lock:
-            if not self.__running:
-                return
-            self.__running = False
+        if not self.__keep_running.is_set():
+            return
+        self.__keep_running.clear()
 
         print("Worker joining tracker thread")
         self.__tracker_thread.join()
