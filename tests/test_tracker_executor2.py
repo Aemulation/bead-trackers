@@ -153,6 +153,8 @@ class TrackerExecutorWorker:
                 self.__stream1.ptr,
             )
             transfer_frames_done_event1.record()
+            self.__tracker2.calculate(host_images_buffer1)
+            device_z_values_buffer2 = self.__tracker2.get_calculated_z()
 
         while True:
             if self.__running_lock.acquire(blocking=False):
@@ -169,6 +171,9 @@ class TrackerExecutorWorker:
 
             self.__controller_pipe.send(
                 (TrackerExecutorControllerCommand.Image, host_images_buffer1[0])
+            )
+            self.__controller_pipe.send(
+                (TrackerExecutorControllerCommand.ZCoordinates, device_z_values_buffer2)
             )
             # TODO: Send y,x and z coordinates from buffer 2 to controller.
             self.__stream1.wait_event(transfer_coordinates_done_event1)
@@ -203,6 +208,9 @@ class TrackerExecutorWorker:
 
             self.__controller_pipe.send(
                 (TrackerExecutorControllerCommand.Image, host_images_buffer2[0])
+            )
+            self.__controller_pipe.send(
+                (TrackerExecutorControllerCommand.ZCoordinates, device_z_values_buffer1)
             )
             # TODO: Send y,x and z coordinates to controller.
             self.__stream1.wait_event(transfer_coordinates_done_event2)
