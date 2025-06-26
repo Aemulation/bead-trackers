@@ -288,6 +288,7 @@ class TrackerExecutorWorker:
             return
         self.__keep_running.clear()
 
+        time.sleep(3)
         print("Worker joining tracker thread")
         self.__tracker_thread.join()
 
