@@ -361,11 +361,11 @@ class TrackerExecutorController:
         self.__controller_to_worker_pipe.send(TrackerExecutorWorkerCommand.Start)
 
     def stop(self):
-        with self.__running_lock:
-            self.__running = False
-
         self.__controller_to_worker_pipe.send(TrackerExecutorWorkerCommand.Stop)
         self.__worker_process.join()
+
+        with self.__running_lock:
+            self.__running = False
         self.__communication_thread.join()
 
 
