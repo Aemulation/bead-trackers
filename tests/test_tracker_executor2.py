@@ -134,6 +134,9 @@ class TrackerExecutorWorker:
             return cupy.uint16
 
     def __run_tracker(self):
+        # TODO: Make configurable
+        self.__setup_tracking(BUFFER_SIZE, 5, self.__roi_coordinates)
+
         transfer_frames_done_event1 = cupy.cuda.Event(disable_timing=True)
         transfer_frames_done_event2 = cupy.cuda.Event(disable_timing=True)
         transfer_coordinates_done_event1 = cupy.cuda.Event(disable_timing=True)
@@ -243,6 +246,8 @@ class TrackerExecutorWorker:
         print("Worker done tracking")
         self.__tracker_done.set()
 
+        self.__teardown_tracking()
+
     def run(
         self,
         controller_pipe: Connection,
@@ -251,12 +256,7 @@ class TrackerExecutorWorker:
         self.__keep_running = threading.Event()
         self.__tracker_done = threading.Event()
 
-        # TODO: Make configurable
-        self.__setup_tracking(BUFFER_SIZE, 5, self.__roi_coordinates)
-
         self.__run_communication()
-
-        self.__teardown_tracking()
 
     def __run_communication(self):
         while True:
