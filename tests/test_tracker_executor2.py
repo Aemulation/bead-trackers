@@ -159,10 +159,12 @@ class TrackerExecutorWorker:
         device_z_values_buffer2 = self.__tracker2.get_calculated_z()
 
         while True:
+            print("Worker grabbing lock...")
             if self.__running_lock.acquire(blocking=False):
                 running = self.__running
                 self.__running_lock.release()
                 if not running:
+                    print("Worker tracker not running anymore")
                     break
 
             with self.__stream2:
