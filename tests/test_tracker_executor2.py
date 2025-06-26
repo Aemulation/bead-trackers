@@ -134,9 +134,6 @@ class TrackerExecutorWorker:
             return cupy.uint16
 
     def __run_tracker(self):
-        # TODO: Make configurable
-        self.__setup_tracking(BUFFER_SIZE, 5, self.__roi_coordinates)
-
         transfer_frames_done_event1 = cupy.cuda.Event(disable_timing=True)
         transfer_frames_done_event2 = cupy.cuda.Event(disable_timing=True)
         transfer_coordinates_done_event1 = cupy.cuda.Event(disable_timing=True)
@@ -246,8 +243,6 @@ class TrackerExecutorWorker:
         print("Worker done tracking")
         self.__tracker_done.set()
 
-        self.__teardown_tracking()
-
     def run(
         self,
         controller_pipe: Connection,
@@ -256,7 +251,12 @@ class TrackerExecutorWorker:
         self.__keep_running = threading.Event()
         self.__tracker_done = threading.Event()
 
+        # TODO: Make configurable
+        self.__setup_tracking(BUFFER_SIZE, 5, self.__roi_coordinates)
+
         self.__run_communication()
+
+        self.__teardown_tracking()
 
     def __run_communication(self):
         while True:
@@ -307,9 +307,8 @@ class TrackerExecutorController:
         tracker_factory: TrackerFactoryProtocol,
         roi_coordinates: np.ndarray,
     ):
-        self.__controller_to_worker_pipe, self.__worker_to_controller_pipe = (
-            multiprocessing.Pipe()
-        )
+        self.__controller_to_worker_queue = multiprocessing.Queue()
+        self.__worker_to_controller_queue = multiprocessing.Queue()
 
         self.__worker = TrackerExecutorWorker(
             camera_factory,
@@ -329,18 +328,18 @@ class TrackerExecutorController:
 
         multiprocessing.set_start_method("spawn")
         self.__worker_process = multiprocessing.Process(
-            target=self.__worker.run, args=(self.__worker_to_controller_pipe,)
+            target=self.__worker.run, args=(self.__worker_to_controller_queue,)
         )
 
     def __run_communication(self):
         while True:
-            if not self.__controller_to_worker_pipe.poll(timeout=0.1):
+            if self.__controller_to_worker_queue.empty():
                 if not self.__running:
                     break
                 time.sleep(0.1)
                 continue
 
-            (command, data) = self.__controller_to_worker_pipe.recv()
+            (command, data) = self.__controller_to_worker_queue.get()
             print(f"Controller got command: {command}")
             if command == TrackerExecutorControllerCommand.Image:
                 image = cast(np.ndarray, data)
@@ -358,10 +357,10 @@ class TrackerExecutorController:
 
         self.__communication_thread.start()
         self.__worker_process.start()
-        self.__controller_to_worker_pipe.send(TrackerExecutorWorkerCommand.Start)
+        self.__controller_to_worker_queue.put(TrackerExecutorWorkerCommand.Start)
 
     def stop(self):
-        self.__controller_to_worker_pipe.send(TrackerExecutorWorkerCommand.Stop)
+        self.__controller_to_worker_queue.put(TrackerExecutorWorkerCommand.Stop)
         self.__worker_process.join()
 
         with self.__running_lock:
