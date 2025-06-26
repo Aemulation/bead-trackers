@@ -60,8 +60,6 @@ class TrackerExecutorWorker:
         self.__frame_width = frame_width
         self.__framerate = framerate
 
-        self.__keep_running = threading.Event()
-
     def __setup_tracking(
         self,
         buffer_size: int,
@@ -252,6 +250,7 @@ class TrackerExecutorWorker:
         controller_pipe: Connection,
     ):
         self.__controller_pipe = controller_pipe
+        self.__keep_running = threading.Event()
 
         # TODO: Make configurable
         self.__setup_tracking(BUFFER_SIZE, 5, self.__roi_coordinates)
