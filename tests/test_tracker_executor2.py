@@ -142,8 +142,6 @@ class TrackerExecutorWorker:
         self.__camera.start_recording()
 
         host_images_buffer1 = self.__camera.get_next_buffer()
-        print(f"Stream1 done: {self.__stream1.done}")
-        print(f"Stream2 done: {self.__stream2.done}")
         self.__stream1.synchronize()
         self.__stream2.synchronize()
         with self.__stream1:
@@ -177,8 +175,6 @@ class TrackerExecutorWorker:
             transfer_coordinates_done_event1 = cupy.cuda.Event(disable_timing=True)
 
             host_images_buffer2 = self.__camera.get_next_buffer()
-            print(f"Stream1 done: {self.__stream1.done}")
-            print(f"Stream2 done: {self.__stream2.done}")
             self.__stream1.synchronize()
             self.__stream2.synchronize()
             with self.__stream1:
@@ -213,8 +209,6 @@ class TrackerExecutorWorker:
             transfer_coordinates_done_event2 = cupy.cuda.Event(disable_timing=True)
 
             host_images_buffer1 = self.__camera.get_next_buffer()
-            print(f"Stream1 done: {self.__stream1.done}")
-            print(f"Stream2 done: {self.__stream2.done}")
             self.__stream1.synchronize()
             self.__stream2.synchronize()
             with self.__stream1:
