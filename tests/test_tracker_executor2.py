@@ -159,6 +159,7 @@ class TrackerExecutorWorker:
         device_z_values_buffer2 = self.__tracker2.get_calculated_z()
 
         while self.__keep_running.is_set():
+            print("Tracker starting while loop")
             with self.__stream2:
                 self.__stream2.wait_event(transfer_frames_done_event2)
                 transfer_frames_done_event2 = cupy.cuda.Event(disable_timing=True)
@@ -235,6 +236,7 @@ class TrackerExecutorWorker:
                     self.__stream1.ptr,
                 )
                 transfer_coordinates_done_event2.record()
+            print("Tracker reached end of for loop")
 
         print("Worker stopping camera")
         self.__camera.stop_recording()
