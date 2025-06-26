@@ -313,6 +313,7 @@ class TrackerExecutorWorker:
 class TrackerExecutorController:
     IMAGE_TOPIC = "TrackerExecutorImageTopic"
     Z_VALUES_TOPIC = "TrackerExecutorZValuesTopic"
+    YX_VALUES_TOPIC = "TrackerExecutorYXValuesTopic"
 
     def __init__(
         self,
@@ -363,6 +364,9 @@ class TrackerExecutorController:
             elif command == TrackerExecutorControllerCommand.ZCoordinates:
                 image = cast(np.ndarray, data)
                 pub.sendMessage(self.Z_VALUES_TOPIC, image=image)
+            elif command == TrackerExecutorControllerCommand.YXCoordinates:
+                image = cast(np.ndarray, data)
+                pub.sendMessage(self.YX_VALUES_TOPIC, image=image)
             else:
                 print(f"Controller received unsupported command: {command}")
         print("Controller communication is done")
