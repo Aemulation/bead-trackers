@@ -179,6 +179,8 @@ class TrackerExecutorWorker:
             self.__stream1.wait_event(transfer_coordinates_done_event1)
             transfer_coordinates_done_event1 = cupy.cuda.Event(disable_timing=True)
 
+            self.__run_communication()
+
             host_images_buffer2 = self.__camera.get_next_buffer()
             self.__stream1.synchronize()
             self.__stream2.synchronize()
@@ -254,25 +256,24 @@ class TrackerExecutorWorker:
         # TODO: Make configurable
         self.__setup_tracking(BUFFER_SIZE, 5, self.__roi_coordinates)
 
-        self.__run_communication()
+        self.__run_tracker()
 
         self.__teardown_tracking()
 
     def __run_communication(self):
-        while True:
-            while not self.__controller_pipe.poll():
-                time.sleep(0.1)
-            command = self.__controller_pipe.recv()
+        while not self.__controller_pipe.poll():
+            time.sleep(0.1)
+        command = self.__controller_pipe.recv()
 
-            if command == TrackerExecutorWorkerCommand.Start:
-                print("Worker starting...")
-                self.__start()
-            elif command == TrackerExecutorWorkerCommand.Stop:
-                print("Worker stopping...")
-                self.__stop()
-                return
-            else:
-                print(f"Worker received unsupported command: {command}")
+        if command == TrackerExecutorWorkerCommand.Start:
+            print("Worker starting...")
+            self.__start()
+        elif command == TrackerExecutorWorkerCommand.Stop:
+            print("Worker stopping...")
+            self.__stop()
+            return
+        else:
+            print(f"Worker received unsupported command: {command}")
 
     def __start(self):
         if self.__keep_running.is_set():
@@ -280,18 +281,10 @@ class TrackerExecutorWorker:
         self.__keep_running.set()
         self.__tracker_done.clear()
 
-        self.__tracker_thread = threading.Thread(target=self.__run_tracker)
-        self.__tracker_thread.start()
-
     def __stop(self):
         if not self.__keep_running.is_set():
             return
         self.__keep_running.clear()
-
-        print("Waiting for tracker to be done")
-        self.__tracker_done.wait()
-        print("Worker joining tracker thread")
-        self.__tracker_thread.join()
 
         # TODO: Remove
         print(f"LOST FRAMES: {self.__camera.get_lost_frames()}")
