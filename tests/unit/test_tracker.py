@@ -141,7 +141,6 @@ def image_buffer_generator():
                     images[buffer_image_id, :, :] = reconstructed_image
 
                 np.save("images", images)
-                time.sleep(10)
                 exit(0)
 
                 yield cupy.array(images)
