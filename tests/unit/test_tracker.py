@@ -228,6 +228,8 @@ def animate_y_values(
         )
         axis.add_patch(circle)
         circles_calculated.append(circle)
+        axis.set_xticks([])
+        axis.set_yticks([])
 
     circles_real = []
     for axis, bead_id in zip(axes, BEADS_TO_VISUALIEZ):
