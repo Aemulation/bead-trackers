@@ -10,7 +10,7 @@ from src.trackers.bead_tracker.radial_profiler import (
 
 @pytest.fixture
 def radial_profiler_config():
-    return RadialProfilerConfig(3.2, 256 / 2 - 3.2 * 3, 10 * 2 - 2, 10, normalize=False)
+    return RadialProfilerConfig(3.2, 256 / 2 - 3.2, 10 * 2, 10, normalize=False)
 
 
 def test_radial_profile_8_bit(radial_profiler_config: RadialProfilerConfig, rings):

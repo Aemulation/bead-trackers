@@ -181,7 +181,6 @@ class RadialProfiler:
             config.max_radius,
             config.num_radial_steps,
             dtype=cupy.float32,
-            endpoint=False,
         )
 
     def profile(
