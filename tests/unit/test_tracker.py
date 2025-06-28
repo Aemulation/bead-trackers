@@ -45,7 +45,8 @@ DATA_DIRECTORY = (
 # DATA_DIRECTORY = "C:/data/Misha/20250520/exp1/RNA67_hairpin_const_forces_save_ROI"
 # DATA_DIRECTORY = "/home/markhonkoop/tmp/RNA67_hairpin_force_extension_save_ROI_tracker"
 
-BEADS_TO_VISUALIEZ = np.array([0, 11, 20, 31, 40, 50, 54, -1])
+# BEADS_TO_VISUALIEZ = np.array([0, 11, 20, 31, 40, 50, 54, -1])
+BEADS_TO_VISUALIEZ = np.array([0, 11, 20, 54])
 # BEADS_TO_VISUALIEZ = np.array([0, 1, 2, 3, 4, 5, 6, 7])
 # BEADS_TO_VISUALIEZ = np.array([8, 9, 10, 11, 12, 13, 14, 15])
 # BEADS_TO_VISUALIEZ = np.array([16, 17, 18, 19, 20, 21, 22, 23])
@@ -208,7 +209,8 @@ def animate_y_values(
 
     num_frames = yx_coordinates.shape[0]
 
-    figure, axes = plt.subplots(2, 4, sharex=True, sharey=True)
+    # figure, axes = plt.subplots(2, 4, sharex=True, sharey=True)
+    figure, axes = plt.subplots(2, 2, sharex=True, sharey=True)
     axes = axes.flatten()
     roi_getter = RoiGetter()
     images = [
@@ -246,10 +248,10 @@ def animate_y_values(
 
     # Create ONE dummy handle
     calculated_patch = matplotlib.patches.Patch(
-        edgecolor="green", facecolor="none", label="New implementation"
+        edgecolor="green", facecolor="green", label="New implementation"
     )
     correct_patch = matplotlib.patches.Patch(
-        edgecolor="red", facecolor="none", label="Old implementation"
+        edgecolor="red", facecolor="red", label="Old implementation"
     )
 
     # Add global legend
