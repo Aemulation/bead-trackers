@@ -140,9 +140,6 @@ def image_buffer_generator():
 
                     images[buffer_image_id, :, :] = reconstructed_image
 
-                np.save("images", images)
-                exit(0)
-
                 yield cupy.array(images)
         except Exception:
             pass
