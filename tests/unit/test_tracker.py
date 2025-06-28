@@ -223,7 +223,7 @@ def animate_y_values(
             (x, y),
             radius=1,
             edgecolor="green",
-            facecolor="none",
+            facecolor="green",
             lw=2,
         )
         axis.add_patch(circle)
@@ -238,11 +238,22 @@ def animate_y_values(
             (x + ROI_SIZE / 2, y + ROI_SIZE / 2),
             radius=1,
             edgecolor="red",
-            facecolor="none",
+            facecolor="red",
             lw=2,
         )
         axis.add_patch(circle)
         circles_real.append(circle)
+
+    # Create ONE dummy handle
+    calculated_patch = matplotlib.patches.Patch(
+        edgecolor="green", facecolor="none", label="New implementation"
+    )
+    correct_patch = matplotlib.patches.Patch(
+        edgecolor="red", facecolor="none", label="Old implementation"
+    )
+
+    # Add global legend
+    figure.legend(handles=[calculated_patch, correct_patch])
 
     # Animation update function
     def update(frame_id):
