@@ -21,6 +21,7 @@ class QuadraticPolynomialFitter:
         column3 = cupy.ones_like(x_points)
 
         unweighted_x_matrix = cupy.vstack((column1, column2, column3))
+        return unweighted_x_matrix
         weighted_x_matrix = (
             unweighted_x_matrix * self.__square_root_weights[cupy.newaxis, :]
         )
@@ -43,7 +44,12 @@ class QuadraticPolynomialFitter:
         # coefficients = coefficients.T
 
         coefficients = cupy.linalg.solve(
-            self.__x_matrix @ self.__x_matrix.T, self.__x_matrix @ weighted_points.T
+            (
+                self.__x_matrix
+                @ cupy.diag(self.__square_root_weights)
+                @ self.__x_matrix.T
+            ),
+            self.__x_matrix @ weighted_points.T,
         ).T
         # end = time.perf_counter()
         # print(f"least sqaures took {end - start} seconds on cpu")
