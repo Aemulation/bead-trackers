@@ -5,14 +5,15 @@ import time
 class QuadraticPolynomialFitter:
     def __init__(
         self,
+        num_batches: int,
         weights: cupy.ndarray = cupy.array([0.15, 0.5, 0.85, 1.0, 0.85, 0.5, 0.15]),
     ) -> None:
-        # self.__square_root_weights = cupy.sqrt(weights)
-        self.__square_root_weights = weights
-        self.__x_matrix = self.__make_x_matrix()
+        self.__num_batches = num_batches
+        self.__weights = weights
+        self.__x_matrix = self.__make_x_matrix(num_batches, weights)
 
-    def __make_x_matrix(self) -> cupy.ndarray:
-        num_points = self.__square_root_weights.shape[0]
+    def __make_x_matrix(self, num_batches: int, weights: cupy.ndarray) -> cupy.ndarray:
+        num_points = weights.shape[0]
 
         x_points = cupy.arange(num_points)
 
@@ -21,38 +22,35 @@ class QuadraticPolynomialFitter:
         column3 = cupy.ones_like(x_points)
 
         unweighted_x_matrix = cupy.vstack((column1, column2, column3))
-        return unweighted_x_matrix
-        weighted_x_matrix = (
-            unweighted_x_matrix * self.__square_root_weights[cupy.newaxis, :]
+        return cupy.repeat(
+            cupy.expand_dims(unweighted_x_matrix, axis=0), repeats=num_batches, axis=0
         )
-        return weighted_x_matrix.copy()
+
+    def __batched_least_squares(self, A: cupy.ndarray, B: cupy.ndarray) -> cupy.ndarray:
+        # TODO: Are these variable names clear?
+        A = cupy.transpose(A, (0, 2, 1))
+        AtA = cupy.einsum("bij,bik->bjk", A, A)
+
+        AtB = cupy.einsum("bij,bi->bj", A, B)
+
+        AtA_inv = cupy.linalg.inv(AtA)
+        return cupy.einsum("bij,bj->bi", AtA_inv, AtB)
 
     def fit_2d(self, points_table: cupy.ndarray) -> cupy.ndarray:
         assert points_table.dtype == cupy.float32
 
+        assert points_table.shape[0] == self.__num_batches
+
         num_points = points_table.shape[1]
-        assert num_points == self.__x_matrix.shape[1]
+        assert num_points == self.__x_matrix.shape[2]
 
-        weighted_points = points_table * self.__square_root_weights[cupy.newaxis, :]
+        weighted_points = points_table * self.__weights
 
-        # start = time.perf_counter()
-        # (coefficients, _, _, _) = cupy.linalg.lstsq(
-        #     self.__x_matrix.T,
-        #     weighted_points.T,
-        # )
-        # return coefficients.T
-        # coefficients = coefficients.T
+        coefficients = self.__batched_least_squares(
+            (self.__x_matrix * self.__weights),
+            weighted_points,
+        )
 
-        coefficients = cupy.linalg.solve(
-            (
-                self.__x_matrix
-                @ cupy.diag(self.__square_root_weights)
-                @ self.__x_matrix.T
-            ),
-            self.__x_matrix @ weighted_points.T,
-        ).T
-        # end = time.perf_counter()
-        # print(f"least sqaures took {end - start} seconds on cpu")
         return coefficients
 
     def get_top(self, coefficients: cupy.ndarray) -> cupy.ndarray:

@@ -99,6 +99,7 @@ class QuadrantInterpolationTracker:
         )
         self.__num_points = self.__least_squares_fit_weights.shape[0]
         self.__quadratic_polynomial_fitter = QuadraticPolynomialFitter(
+            self.__num_images * self.__num_beads,
             self.__least_squares_fit_weights,
         )
 

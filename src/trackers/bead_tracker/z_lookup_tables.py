@@ -81,7 +81,7 @@ class ZLookupTables:
 
         self.__num_points = least_squares_fit_weights.shape[0]
         self.__quadratic_polynomial_fitter = QuadraticPolynomialFitter(
-            least_squares_fit_weights
+            self.__num_images * self.__num_beads, least_squares_fit_weights
         )
         self.__num_z_values = z_values.shape[0]
 
