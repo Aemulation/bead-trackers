@@ -109,9 +109,7 @@ class QuadrantInterpolationTracker:
 
     @staticmethod
     def __fft_cross_correlate(intensity_profile: cupy.ndarray) -> cupy.ndarray:
-        return cross_correlate_nested_1d(
-            intensity_profile, cupy.flip(intensity_profile, axis=0)
-        )
+        return cross_correlate_nested_1d(intensity_profile)
 
     def __get_relevant_points(self, match_scores_table: cupy.ndarray) -> cupy.ndarray:
         num_beads, num_z_planes = match_scores_table.shape
