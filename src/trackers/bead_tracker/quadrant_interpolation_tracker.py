@@ -183,25 +183,15 @@ class QuadrantInterpolationTracker:
             radial_profiles_bottom_left + radial_profiles_bottom_right
         )
 
-        # # TODO: These copies should not be necessary.
         intensity_profile_x = cupy.concatenate(
             (cupy.flip(radial_profiles_left, axis=2), radial_profiles_right), axis=2
-        ).copy()
+        )
         assert intensity_profile_x.dtype == cupy.float32
         intensity_profile_y = cupy.concatenate(
             (cupy.flip(radial_profiles_bottom, axis=2), radial_profiles_top),
             axis=2,
-        ).copy()
+        )
         assert intensity_profile_y.dtype == cupy.float32
-        # intensity_profile_x = cupy.concatenate(
-        #     (cupy.flip(radial_profiles_left, axis=2), radial_profiles_right), axis=2
-        # )
-        # assert intensity_profile_x.dtype == cupy.float32
-        # intensity_profile_y = cupy.concatenate(
-        #     (cupy.flip(radial_profiles_bottom, axis=2), radial_profiles_top),
-        #     axis=2,
-        # )
-        # assert intensity_profile_y.dtype == cupy.float32
 
         num_images, num_beads, num_profiles = intensity_profile_x.shape
         X = QuadrantInterpolationTracker.__fft_cross_correlate(
