@@ -27,16 +27,16 @@ class QuadraticPolynomialFitter:
         )
 
     def __batched_least_squares(
-        self, A: cupy.ndarray, B: cupy.ndarray, weights: cupy.ndarray
+        self, X: cupy.ndarray, Y: cupy.ndarray, weights: cupy.ndarray
     ) -> cupy.ndarray:
-        # TODO: Are these variable names clear?
-        A = cupy.transpose(A, (0, 2, 1))
-        AtA = cupy.einsum("bij,bik->bjk", A, A)
+        W = cupy.diag(weights)
 
-        AtB = cupy.einsum("bij,bi->bj", A, B)
+        XtWX = cupy.einsum("bij,ii,bik->bjk", X, W, X)
+        XtWX_inv = cupy.linalg.inv(XtWX)
 
-        AtA_inv = cupy.linalg.inv(AtA)
-        return cupy.einsum("bij,bj->bi", AtA_inv, AtB)
+        XtWY = cupy.einsum("bij,ii, bi->bj", X, W, Y)
+
+        return cupy.einsum("bij,bj->bi", XtWX_inv, XtWY)
 
     def fit_2d(self, points_table: cupy.ndarray) -> cupy.ndarray:
         assert points_table.dtype == cupy.float32

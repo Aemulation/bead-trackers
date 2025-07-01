@@ -8,6 +8,9 @@ from src.trackers.bead_tracker.quadratic_polynomial_fitter import (
 
 COEFFICIENTS = (1, -1, 4)
 
+NUM_BATCHES = 50
+NUM_POINTS = 5
+
 
 def f(x):
     return COEFFICIENTS[0] * x**2 + COEFFICIENTS[1] * x + COEFFICIENTS[2]
@@ -15,15 +18,19 @@ def f(x):
 
 @pytest.fixture
 def mock_points() -> cupy.ndarray:
-    num_beads = 2000
-
-    return cupy.array([[f(x) for x in (0, 1, 2, 3, 4)]] * num_beads, dtype=cupy.float32)
+    return cupy.repeat(
+        cupy.expand_dims(
+            cupy.array([f(x) for x in (0, 1, 2, 3, 4)], dtype=cupy.float32), axis=0
+        ),
+        repeats=NUM_BATCHES,
+        axis=0,
+    )
 
 
 @pytest.fixture
 def quadratic_polynomial_fitter():
     weights = cupy.array([0.5, 0.85, 1.0, 0.85, 0.5])
-    return QuadraticPolynomialFitter(weights)
+    return QuadraticPolynomialFitter(NUM_BATCHES, weights)
 
 
 def test_quadratic_polynomial_fitter(
@@ -53,7 +60,7 @@ def test_quadratic_polynomial_fitter_time(
     quadratic_polynomial_fitter: QuadraticPolynomialFitter, mock_points: cupy.ndarray
 ):
     weights = cupy.array([0.5, 0.85, 1.0, 0.85, 0.5])
-    quadratic_polynomial_fitter = QuadraticPolynomialFitter(weights)
+    quadratic_polynomial_fitter = QuadraticPolynomialFitter(NUM_BATCHES, weights)
 
     total_elapsed = 0
     first = True
