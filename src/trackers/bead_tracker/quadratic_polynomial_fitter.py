@@ -26,7 +26,9 @@ class QuadraticPolynomialFitter:
             cupy.expand_dims(unweighted_x_matrix, axis=0), repeats=num_batches, axis=0
         )
 
-    def __batched_least_squares(self, A: cupy.ndarray, B: cupy.ndarray) -> cupy.ndarray:
+    def __batched_least_squares(
+        self, A: cupy.ndarray, B: cupy.ndarray, weights: cupy.ndarray
+    ) -> cupy.ndarray:
         # TODO: Are these variable names clear?
         A = cupy.transpose(A, (0, 2, 1))
         AtA = cupy.einsum("bij,bik->bjk", A, A)
@@ -44,11 +46,8 @@ class QuadraticPolynomialFitter:
         num_points = points_table.shape[1]
         assert num_points == self.__x_matrix.shape[2]
 
-        weighted_points = points_table * self.__weights
-
         coefficients = self.__batched_least_squares(
-            (self.__x_matrix * self.__weights),
-            weighted_points,
+            cupy.transpose(self.__x_matrix, (0, 2, 1)), points_table, self.__weights
         )
 
         return coefficients
