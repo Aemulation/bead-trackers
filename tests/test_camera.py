@@ -37,7 +37,7 @@ IMAGE_WIDTH = 2560
 CAMERA_ARGUMENTS = {
     "camera_index": 0,
     "enable_fan": False,
-    "number_of_copy_threads_per_buffer": 1,
+    # "number_of_copy_threads_per_buffer": 1,
 }
 
 # NUM_ITERS = 1_000
