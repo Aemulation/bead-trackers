@@ -27,7 +27,7 @@ from cameras.camera_protocol import (
 )
 
 
-BUFFER_SIZE = 300
+BUFFER_SIZE = 500
 NUM_BUFFERS = 5
 
 
