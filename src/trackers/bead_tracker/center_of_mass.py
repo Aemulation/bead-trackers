@@ -77,7 +77,7 @@ class CenterOfMass:
         num_images, image_height, image_width = images.shape
         num_rois = roi_coordinates.shape[0]
 
-        num_threads = (16,)
+        num_threads = (1024,)
         num_blocks = (num_rois // num_threads[0] + 1, num_images)
 
         calculate_averages_kernel(
@@ -113,7 +113,7 @@ class CenterOfMass:
         num_images, image_height, image_width = images.shape
         num_rois = roi_coordinates.shape[0]
 
-        num_threads = (16,)
+        num_threads = (1024,)
         num_blocks = (num_rois // num_threads[0] + 1, num_images)
 
         center_of_mass_kernel(

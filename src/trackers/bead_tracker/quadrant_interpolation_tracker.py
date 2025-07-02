@@ -114,7 +114,7 @@ class QuadrantInterpolationTracker:
     def __get_relevant_points(self, match_scores_table: cupy.ndarray) -> cupy.ndarray:
         num_beads, num_z_planes = match_scores_table.shape
 
-        num_threads = (16,)
+        num_threads = (1024,)
         num_blocks = (num_beads // num_threads[0] + 1,)
 
         copy_relevant_points_max_kernel = self.__cuda_modules.copy_relevant_points_max()

@@ -105,7 +105,7 @@ class ZLookupTables:
         assert self.__z_lookup_tables.dtype == cupy.float32
         assert radial_profiles.dtype == cupy.float32
 
-        num_threads = (16, 16)
+        num_threads = (32, 32)
         num_blocks = (
             num_beads // num_threads[0] + 1,
             num_z_planes // num_threads[1] + 1,
@@ -133,7 +133,7 @@ class ZLookupTables:
     def __get_relevant_points(self, match_scores_table: cupy.ndarray) -> cupy.ndarray:
         num_beads, num_z_planes = match_scores_table.shape
 
-        num_threads = (16,)
+        num_threads = (1024,)
         num_blocks = (num_beads // num_threads[0] + 1,)
 
         copy_relevant_points_min_kernel = self.__cuda_modules.copy_relevant_points_min()
