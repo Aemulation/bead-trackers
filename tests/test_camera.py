@@ -89,9 +89,11 @@ def test_tracker_executor2():
         print(f"{i}/{NUM_ITERS}")
         camera.get_next_buffer()
 
+    lost_frames = camera.get_lost_frames()
+    print(f"LOST FRAMES BEFORE STOP: {lost_frames}")
     camera.stop_recording()
 
     lost_frames = camera.get_lost_frames()
-    print(f"LOST FRAMES: {lost_frames}")
+    print(f"LOST FRAMES AFTER STOP: {lost_frames}")
 
     print("DONE")
