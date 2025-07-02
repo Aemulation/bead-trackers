@@ -31,23 +31,8 @@ BUFFER_SIZE = 500
 NUM_BUFFERS = 5
 
 
-NUM_ROIS = 10
-ROI_COORDINATES = cupy.array([[0, 0]] * NUM_ROIS, dtype=cupy.uint32)
-ROI_SIZE = 100
-
 IMAGE_HEIGHT = 2016
 IMAGE_WIDTH = 2560
-
-QI_TRACKER_ARGUMENTS = {
-    "num_images_per_buffer": BUFFER_SIZE,
-    "roi_coordinates": ROI_COORDINATES,
-    "roi_size": ROI_SIZE,
-    "zstacks": cupy.zeros([NUM_ROIS, 20, ROI_SIZE, ROI_SIZE], dtype=cupy.uint16),
-    "number_of_qi_radial_steps": ROI_SIZE // 4,
-    "number_of_qi_angle_steps": 100,
-    "number_of_lut_radial_steps": 100,
-    "number_of_lut_angle_steps": 100,
-}
 
 CAMERA_ARGUMENTS = {
     "camera_index": 0,
@@ -60,9 +45,6 @@ NUM_ITERS = 100
 
 
 def test_tracker_executor2():
-    tracker_factory = TrackerFactoryClassRegistry.create(
-        "qi_tracker", **QI_TRACKER_ARGUMENTS
-    )
     camera_factory = CameraFactoryClassRegistry.create("dhyana2100", **CAMERA_ARGUMENTS)
 
     print("CREATING CAMERA")
