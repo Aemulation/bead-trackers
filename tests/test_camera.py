@@ -57,7 +57,7 @@ def test_tracker_executor2():
     camera.set_framerate(975)
 
     buffers = [
-        np.zeros((BUFFER_SIZE, IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint16)
+        cupyx.zeros_pinned((BUFFER_SIZE, IMAGE_HEIGHT, IMAGE_WIDTH), dtype=cupy.uint16)
         for _ in range(NUM_BUFFERS)
     ]
 
