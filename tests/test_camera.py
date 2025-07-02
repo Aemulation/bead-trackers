@@ -74,8 +74,12 @@ def test_tracker_executor2():
     camera.set_height(IMAGE_WIDTH)
     camera.set_framerate(975)
 
-    for _ in range(NUM_BUFFERS):
-        buffer = np.zeros((BUFFER_SIZE, IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint16)
+    buffers = [
+        np.zeros((BUFFER_SIZE, IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint16)
+        for _ in range(NUM_BUFFERS)
+    ]
+
+    for buffer in buffers:
         camera.add_buffer(buffer)
 
     print("START RECORDING")
