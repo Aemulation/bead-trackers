@@ -85,7 +85,8 @@ def test_tracker_executor2():
     print("START RECORDING")
     camera.start_recording()
 
-    for _ in range(NUM_ITERS):
+    for i in range(NUM_ITERS):
+        print(f"{i}/{NUM_ITERS}")
         camera.get_next_buffer()
 
     camera.stop_recording()
