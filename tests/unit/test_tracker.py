@@ -446,26 +446,28 @@ def test_tracker_measure_buffer_size(
     cupy.random.seed(42)
 
     buffer_sizes = [
-        1,
-        10,
-        100,
-        200,
+        # 1,
+        # 10,
+        # 100,
+        # 200,
         300,
         400,
         500,
     ]
     num_roises = [
-        100,
-        200,
-        300,
-        400,
-        500,
+        # 100,
+        # 200,
+        # 300,
+        # 400,
+        # 500,
         600,
     ]
 
+    num_iters = 1000
+
     min_radius = 1
     max_radius = ROI_SIZE / 4
-    number_of_qi_angle_steps = 100
+    number_of_qi_angle_steps = 200
     number_of_qi_radial_steps = ROI_SIZE // 4
     number_of_qi_iterations = 3
 
@@ -504,7 +506,6 @@ def test_tracker_measure_buffer_size(
             )
 
             total_elapsed = 0
-            num_iters = 1000
 
             # Warmup
             for _ in range(10):
@@ -525,7 +526,7 @@ def test_tracker_measure_buffer_size(
                 print(f"ELAPSED: {t}ms")
                 elapsed_times.append(t)
 
-            print(f"AVERAGE ELAPSED: {total_elapsed / (num_iters - 1)}ms")
+            print(f"AVERAGE ELAPSED: {total_elapsed / (num_iters)}ms")
             data[num_images] = elapsed_times
 
         data["parameters"] = {
