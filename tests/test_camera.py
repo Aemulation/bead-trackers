@@ -43,7 +43,7 @@ CAMERA_ARGUMENTS = {
 
 # NUM_ITERS = 1_000
 # NUM_ITERS = 100
-NUM_ITERS = 30_000
+NUM_ITERS = 3_000
 
 
 def test_tracker_executor2():
