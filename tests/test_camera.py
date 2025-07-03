@@ -43,7 +43,7 @@ CAMERA_ARGUMENTS = {
 
 # NUM_ITERS = 1_000
 # NUM_ITERS = 100
-NUM_ITERS = 100_000
+NUM_ITERS = 300_000
 
 
 def test_tracker_executor2():
@@ -79,5 +79,7 @@ def test_tracker_executor2():
 
     lost_frames = camera.get_lost_frames()
     print(f"LOST FRAMES AFTER STOP: {lost_frames}")
+
+    camera.close()
 
     print("DONE")
