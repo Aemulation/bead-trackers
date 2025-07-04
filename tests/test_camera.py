@@ -58,6 +58,10 @@ def test_tracker_executor2():
     camera.set_height(IMAGE_WIDTH)
     camera.set_framerate(975)
 
+    print(f"WIDTH: {camera.get_width()}")
+    print(f"HEIGHT: {camera.get_height()}")
+    print(f"FPS:    {camera.get_framerate()}")
+
     buffers = [
         cupyx.zeros_pinned((BUFFER_SIZE, IMAGE_HEIGHT, IMAGE_WIDTH), dtype=cupy.uint16)
         for _ in range(NUM_BUFFERS)
