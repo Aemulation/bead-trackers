@@ -2,6 +2,7 @@ import cupy
 import cupyx
 
 from pubsub import pub
+import time
 
 from dataclasses import dataclass
 from enum import Enum
@@ -69,9 +70,18 @@ def test_tracker_executor2():
     print("START RECORDING")
     camera.start_recording()
 
+    times = []
     for i in range(NUM_ITERS):
-        print(f"{i}/{NUM_ITERS}")
+        # print(f"{i}/{NUM_ITERS}")
+        start = time.perf_counter()
         camera.get_next_buffer()
+        end = time.perf_counter()
+        times.append(end - start)
+        # print(f"Elapsed: {(end - start) * 1_000}ms")
+
+    times = np.array(times)
+    print(f"Average: {np.mean(times)}")
+    print(f"Std:     {np.std(times)}")
 
     lost_frames = camera.get_lost_frames()
     print(f"LOST FRAMES BEFORE STOP: {lost_frames}")
