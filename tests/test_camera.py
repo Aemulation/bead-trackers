@@ -28,14 +28,13 @@ from cameras.camera_protocol import (
 )
 
 
-BUFFER_SIZE = 300 * 2
+BUFFER_SIZE = 300
 NUM_BUFFERS = 5
 
 
-# IMAGE_HEIGHT = 2016
-IMAGE_HEIGHT = 2016 // 2
+IMAGE_HEIGHT = 2016
 IMAGE_WIDTH = 2560
-FRAMERATE = 975 * 2
+FRAMERATE = 975
 
 CAMERA_ARGUMENTS = {
     "camera_index": 0,
@@ -63,8 +62,12 @@ def test_tracker_executor2():
     print(f"HEIGHT: {camera.get_height()}")
     print(f"FPS:    {camera.get_framerate()}")
 
+    # buffers = [
+    #     cupyx.zeros_pinned((BUFFER_SIZE, IMAGE_HEIGHT, IMAGE_WIDTH), dtype=cupy.uint16)
+    #     for _ in range(NUM_BUFFERS)
+    # ]
     buffers = [
-        cupyx.zeros_pinned((BUFFER_SIZE, IMAGE_HEIGHT, IMAGE_WIDTH), dtype=cupy.uint16)
+        np.zeros((BUFFER_SIZE, IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint16)
         for _ in range(NUM_BUFFERS)
     ]
 
