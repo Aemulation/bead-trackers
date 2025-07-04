@@ -28,8 +28,7 @@ from cameras.camera_protocol import (
 )
 
 
-# BUFFER_SIZE = 300
-BUFFER_SIZE = 1
+BUFFER_SIZE = 300
 NUM_BUFFERS = 5
 
 
@@ -43,8 +42,7 @@ CAMERA_ARGUMENTS = {
 }
 
 # NUM_ITERS = 1_000
-# NUM_ITERS = 100
-NUM_ITERS = 3_000
+NUM_ITERS = 100
 
 
 def test_tracker_executor2():
