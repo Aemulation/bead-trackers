@@ -55,7 +55,7 @@ def test_tracker_executor2():
     print("Opening camera")
     camera.open()
     camera.set_height(IMAGE_HEIGHT)
-    camera.set_height(IMAGE_WIDTH)
+    camera.set_width(IMAGE_WIDTH)
     camera.set_framerate(975)
 
     print(f"WIDTH: {camera.get_width()}")
