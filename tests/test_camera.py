@@ -28,11 +28,12 @@ from cameras.camera_protocol import (
 )
 
 
-BUFFER_SIZE = 300
+BUFFER_SIZE = 300 * 2
 NUM_BUFFERS = 5
 
 
-IMAGE_HEIGHT = 2016
+# IMAGE_HEIGHT = 2016
+IMAGE_HEIGHT = 2016 // 2
 IMAGE_WIDTH = 2560
 
 CAMERA_ARGUMENTS = {
