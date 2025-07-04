@@ -35,6 +35,7 @@ NUM_BUFFERS = 5
 # IMAGE_HEIGHT = 2016
 IMAGE_HEIGHT = 2016 // 2
 IMAGE_WIDTH = 2560
+FRAMERATE = 975 * 2
 
 CAMERA_ARGUMENTS = {
     "camera_index": 0,
@@ -56,7 +57,7 @@ def test_tracker_executor2():
     camera.open()
     camera.set_height(IMAGE_HEIGHT)
     camera.set_width(IMAGE_WIDTH)
-    camera.set_framerate(975)
+    camera.set_framerate(FRAMERATE)
 
     print(f"WIDTH: {camera.get_width()}")
     print(f"HEIGHT: {camera.get_height()}")
