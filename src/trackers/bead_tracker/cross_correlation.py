@@ -5,7 +5,7 @@ def cross_correlate_nested_1d(input: cupy.ndarray) -> cupy.ndarray:
     length = input.shape[1]
 
     padded_input1 = cupy.pad(input, ((0, 0), (0, length - 1)))
-    padded_input2 = cupy.pad(cupy.flip(input, axis=0), ((0, 0), (0, length - 1)))
+    padded_input2 = cupy.pad(cupy.flip(input, axis=1), ((0, 0), (0, length - 1)))
 
     input1 = cupy.fft.fft(padded_input1, axis=1)
     input2 = cupy.conj(cupy.fft.fft(padded_input2, axis=1))
