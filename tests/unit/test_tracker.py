@@ -399,7 +399,7 @@ def test_tracker_time(
 ):
     images = cupy.repeat(cupy.expand_dims(camera_image, axis=0), NUM_IMAGES, axis=0)
 
-    num_rois = 600
+    num_rois = 800
     height, width = camera_image.shape
     roi_coordinates = make_roi_coordinates(num_rois, height, width, ROI_SIZE)
 
@@ -425,7 +425,7 @@ def test_tracker_time(
     )
 
     total_elapsed = 0
-    num_iters = 1000
+    num_iters = 200
 
     # Warmup
     for _ in range(10):
