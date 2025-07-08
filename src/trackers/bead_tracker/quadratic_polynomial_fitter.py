@@ -9,7 +9,7 @@ class QuadraticPolynomialFitter:
         weights: cupy.ndarray = cupy.array([0.15, 0.5, 0.85, 1.0, 0.85, 0.5, 0.15]),
     ) -> None:
         self.__num_batches = num_batches
-        self.__weights = weights
+        self.__weights_matrix = cupy.diag(weights)
         self.__x_matrix = self.__make_x_matrix(num_batches, weights)
 
     def __make_x_matrix(self, num_batches: int, weights: cupy.ndarray) -> cupy.ndarray:
@@ -22,14 +22,17 @@ class QuadraticPolynomialFitter:
         column3 = cupy.ones_like(x_points)
 
         unweighted_x_matrix = cupy.vstack((column1, column2, column3))
-        return cupy.repeat(
-            cupy.expand_dims(unweighted_x_matrix, axis=0), repeats=num_batches, axis=0
-        )
+        return cupy.transpose(
+            cupy.repeat(
+                cupy.expand_dims(unweighted_x_matrix, axis=0),
+                repeats=num_batches,
+                axis=0,
+            ),
+            (0, 2, 1),
+        ).copy()
 
-    def __batched_least_squares(
-        self, X: cupy.ndarray, Y: cupy.ndarray, weights: cupy.ndarray
-    ) -> cupy.ndarray:
-        W = cupy.diag(weights)
+    def __batched_least_squares(self, X: cupy.ndarray, Y: cupy.ndarray) -> cupy.ndarray:
+        W = self.__weights_matrix
 
         XtWX = cupy.einsum("bij,ii,bik->bjk", X, W, X)
         XtWX_inv = cupy.linalg.inv(XtWX)
@@ -44,11 +47,9 @@ class QuadraticPolynomialFitter:
         assert points_table.shape[0] == self.__num_batches
 
         num_points = points_table.shape[1]
-        assert num_points == self.__x_matrix.shape[2]
+        assert num_points == self.__x_matrix.shape[1]
 
-        coefficients = self.__batched_least_squares(
-            cupy.transpose(self.__x_matrix, (0, 2, 1)), points_table, self.__weights
-        )
+        coefficients = self.__batched_least_squares(self.__x_matrix, points_table)
 
         return coefficients
 
