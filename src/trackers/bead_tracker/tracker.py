@@ -99,7 +99,6 @@ class Tracker(TrackerProtocol):
         self.__bead_coordinates = None
         self.__z_values = None
         self.__roi_coordinates = roi_coordinates
-        self.__roi_size = roi_size
         self.__number_of_qi_iterations = number_of_qi_iterations
 
         self.__center_of_mass = CenterOfMass(
