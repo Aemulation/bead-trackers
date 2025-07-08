@@ -156,14 +156,14 @@ def test_tracker_real_lazy(
         ROI_SIZE,
         zstacks,
         1,
-        ROI_SIZE // 4,
-        (ROI_SIZE // 4) * 3,
-        100,
+        ROI_SIZE // 2,
+        (ROI_SIZE // 2 - 1) * 3,
+        263,
         3,
         1,
-        ROI_SIZE // 4,
-        ROI_SIZE // 4,
-        100,
+        ROI_SIZE // 2,
+        ROI_SIZE // 2 - 1,
+        263,
     )
 
     all_yx_coordinates = []
@@ -195,6 +195,7 @@ def test_tracker_real_lazy(
 
     plot_yx_values(all_yx_coordinates, roi_coordinates, traces)
     plot_z_values(all_z_values, traces)
+    cupy.save("all_z_values", all_z_values)
 
     plt.ioff()
     animate_y_values(all_yx_coordinates, roi_coordinates, traces)
@@ -255,7 +256,7 @@ def animate_y_values(
     )
 
     # Add global legend
-    figure.legend(handles=[calculated_patch, correct_patch])
+    figure.legend(handles=[calculated_patch, correct_patch], fontsize=14)
 
     # Animation update function
     def update(frame_id):
@@ -278,6 +279,7 @@ def animate_y_values(
         figure, update, frames=range(0, num_frames, 30), blit=True, repeat=True
     )
 
+    plt.savefig("tmp.png")
     plt.show()
 
 
@@ -286,7 +288,7 @@ def plot_yx_values(
 ):
     yx_in_roi_coordinates = yx_coordinates - roi_coordinates
 
-    figure, axes = plt.subplots(2, 4, sharex=True, sharey=True)
+    figure, axes = plt.subplots(2, 2, sharex=True, sharey=True)
     for axis, bead_id in zip(axes.reshape(-1), BEADS_TO_VISUALIEZ):
         axis.plot(
             yx_in_roi_coordinates[:, bead_id, 0].get() - ROI_SIZE / 2,
@@ -305,7 +307,7 @@ def plot_yx_values(
     plt.legend()
     plt.pause(0.001)
 
-    figure, axes = plt.subplots(2, 4, sharex=True, sharey=True)
+    figure, axes = plt.subplots(2, 2, sharex=True, sharey=True)
     for axis, bead_id in zip(axes.reshape(-1), BEADS_TO_VISUALIEZ):
         axis.plot(
             yx_in_roi_coordinates[:, bead_id, 1].get() - ROI_SIZE / 2,
@@ -373,11 +375,14 @@ def plot_yx_values(
 
 
 def plot_z_values(z_values: cupy.ndarray, traces: cupy.ndarray):
-    figure, axes = plt.subplots(2, 4, sharex=True, sharey=True)
+    figure, axes = plt.subplots(2, 2, sharex=True, sharey=True)
 
     for axis, bead_id in zip(axes.reshape(-1), BEADS_TO_VISUALIEZ):
-        axis.plot(z_values[:, bead_id].get() * Z_CORRECTION)
-        axis.plot(traces[:, bead_id, 2].get())
+        axis.plot(
+            z_values[:, bead_id].get() * Z_CORRECTION,
+            label="z-coordinates new implementation",
+        )
+        axis.plot(traces[:, bead_id, 2].get(), label="z-coordinates old implementation")
 
         # relative_z = z_values[:, bead_id] - z_values[:, REFERENCE_BEAD_ID]
         # axis.plot(relative_z.get())
@@ -385,6 +390,7 @@ def plot_z_values(z_values: cupy.ndarray, traces: cupy.ndarray):
     # plt.ylim([3, 5])
     # plt.ylim([70, 85])
     plt.ylim([0, 100])
+    figure.legend()
     plt.show()
 
 
@@ -408,13 +414,13 @@ def test_tracker_time(
         ROI_SIZE,
         zstacks,
         1,
-        ROI_SIZE // 4,
-        (ROI_SIZE // 4) * 3,
+        ROI_SIZE // 2,
+        (ROI_SIZE // 2 - 1) * 3,
         100,
         3,
         1,
-        ROI_SIZE // 4,
-        ROI_SIZE // 4,
+        ROI_SIZE // 2,
+        ROI_SIZE // 2 - 1,
         100,
     )
 
