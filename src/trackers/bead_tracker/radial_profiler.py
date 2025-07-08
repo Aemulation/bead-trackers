@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import cupy
+import math
 from dataclasses import dataclass
 
 HERE = os.path.dirname(__file__)
@@ -105,8 +106,8 @@ class RadialProfiler:
 
         num_threads = (32, 32)
         num_blocks = (
-            num_beads // num_threads[0] + 1,
-            num_radials // num_threads[1] + 1,
+            math.ceil(num_beads / num_threads[0]),
+            math.ceil(num_radials / num_threads[1]),
             num_images,
         )
 
@@ -140,20 +141,22 @@ class RadialProfiler:
             radial_profiles, axis=2, out=self.__buffers.normalize_mean_buffer
         )
         meaned_radial_profile = cupy.subtract(
-            radial_profiles, mean[..., None], out=self.__buffers.normalize_buffer
+            radial_profiles,
+            cupy.expand_dims(mean, axis=-1),
+            out=self.__buffers.normalize_buffer,
         )
 
-        rms_squared_sum = cupy.sum(
+        squared_sum = cupy.sum(
             cupy.square(meaned_radial_profile),
             axis=2,
             out=self.__buffers.normalize_rms_buffer,
         )
-        total_rms = cupy.sqrt(
-            rms_squared_sum / num_radials, out=self.__buffers.normalize_rms_buffer
+        std = cupy.sqrt(
+            squared_sum / num_radials, out=self.__buffers.normalize_rms_buffer
         )
         normalized_radial_profiles = cupy.divide(
             meaned_radial_profile,
-            total_rms[..., None],
+            cupy.expand_dims(std, axis=-1),
             out=self.__buffers.normalize_buffer,
         )
 
