@@ -55,12 +55,6 @@ class CenterOfMass:
 
         self.__buffers = Buffers(num_images, num_rois)
 
-        self.__range = cupy.arange(self.__roi_size, dtype=cupy.int32)
-
-        self.__offset_y, self.__offset_x = cupy.meshgrid(
-            cupy.arange(self.__roi_size), cupy.arange(self.__roi_size), indexing="ij"
-        )  # (K, K)
-
     def __calculate_averages(
         self,
         images: cupy.ndarray,
