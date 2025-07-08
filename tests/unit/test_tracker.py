@@ -452,29 +452,29 @@ def test_tracker_measure_buffer_size(
     cupy.random.seed(42)
 
     buffer_sizes = [
-        # 1,
-        # 10,
-        # 100,
-        # 200,
+        1,
+        10,
+        100,
+        200,
         300,
         400,
         500,
     ]
     num_roises = [
-        # 100,
-        # 200,
-        # 300,
-        # 400,
-        # 500,
+        100,
+        200,
+        300,
+        400,
+        500,
         600,
     ]
 
     num_iters = 1000
 
     min_radius = 1
-    max_radius = ROI_SIZE / 4
+    max_radius = ROI_SIZE // 2
     number_of_qi_angle_steps = 200
-    number_of_qi_radial_steps = ROI_SIZE // 4
+    number_of_qi_radial_steps = ROI_SIZE // 2 - 1
     number_of_qi_iterations = 3
 
     pathlib.Path("test-results/buffer-sizes").mkdir(parents=True, exist_ok=True)
@@ -506,9 +506,9 @@ def test_tracker_measure_buffer_size(
                 number_of_qi_angle_steps,
                 number_of_qi_iterations,
                 1,
-                ROI_SIZE // 4,
-                ROI_SIZE // 4,
-                100,
+                ROI_SIZE // 2,
+                ROI_SIZE // 2 - 1,
+                200,
             )
 
             total_elapsed = 0
