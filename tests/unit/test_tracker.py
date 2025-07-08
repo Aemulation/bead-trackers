@@ -24,7 +24,7 @@ from tests.unit.conftest import NUM_RADIALS, NUM_Z_LAYERS, make_roi_coordinates
 import time
 
 
-NUM_IMAGES = 300
+NUM_IMAGES = 400
 ROI_SIZE = 60
 
 NUM_RADIAL_STEPS = (ROI_SIZE // 4) - 1
