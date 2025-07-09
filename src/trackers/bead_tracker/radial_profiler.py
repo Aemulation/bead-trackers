@@ -104,7 +104,7 @@ class RadialProfiler:
         num_radials = self.__radial_lookup_table.shape[0]
         num_radial_positions = self.__radial_position_lookup_table.shape[0]
 
-        num_threads = (32, 32)
+        num_threads = (16, 16)
         num_blocks = (
             math.ceil(num_beads / num_threads[0]),
             math.ceil(num_radials / num_threads[1]),
