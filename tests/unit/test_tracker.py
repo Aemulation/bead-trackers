@@ -452,26 +452,26 @@ def test_tracker_measure_buffer_size(
     cupy.random.seed(42)
 
     buffer_sizes = [
-        1,
-        10,
-        100,
-        200,
+        # 1,
+        # 10,
+        # 100,
+        # 200,
         300,
-        400,
-        500,
+        # 400,
+        # 500,
     ]
     num_roises = [
         # 100,
         # 200,
         # 300,
         # 400,
-        # 500,
+        500,
         # 600,
         # 700,
         # 800,
         # 900,
-        1_000,
-        1_100,
+        # 1_000,
+        # 1_100,
     ]
 
     num_iters = 1000
@@ -552,7 +552,9 @@ def test_tracker_measure_buffer_size(
             [f"{key}={value}" for key, value in data["parameters"].items()]
         )
 
-        with open(f"test-results/buffer-sizes/{file_name}.json", "w") as file:
+        # with open(f"test-results/buffer-sizes/{file_name}.json", "w") as file:
+        #     json.dump(data, file)
+        with open(f"test-results/block-sizes/{file_name}.json", "w") as file:
             json.dump(data, file)
 
 
