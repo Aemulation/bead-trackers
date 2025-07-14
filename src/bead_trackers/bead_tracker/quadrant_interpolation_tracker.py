@@ -3,11 +3,11 @@ import numpy as np
 import cupy
 from typing import cast
 
-from src.bead_trackers.bead_tracker.cross_correlation import cross_correlate_nested_1d
-from src.bead_trackers.bead_tracker.quadratic_polynomial_fitter import (
+from bead_trackers.bead_tracker.cross_correlation import cross_correlate_nested_1d
+from bead_trackers.bead_tracker.quadratic_polynomial_fitter import (
     QuadraticPolynomialFitter,
 )
-from src.bead_trackers.bead_tracker.radial_profiler import (
+from bead_trackers.bead_tracker.radial_profiler import (
     RadialProfiler,
     RadialProfilerConfig,
 )
