@@ -2,7 +2,7 @@ import numpy as np
 import cupy
 import pytest
 
-from src.trackers.bead_tracker.radial_profiler import (
+from src.bead_trackers.bead_tracker.radial_profiler import (
     RadialProfiler,
     RadialProfilerConfig,
 )

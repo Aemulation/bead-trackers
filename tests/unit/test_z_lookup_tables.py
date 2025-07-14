@@ -1,6 +1,6 @@
 import cupy
 
-from src.trackers.bead_tracker.z_lookup_tables import ZLookupTables
+from src.bead_trackers.bead_tracker.z_lookup_tables import ZLookupTables
 
 from tests.unit.conftest import NUM_Z_LAYERS
 

@@ -6,9 +6,9 @@ import threading
 
 import time
 
-from src.trackers.bead_tracker.tracker import Tracker
-from src.trackers.bead_tracker.radial_profiler import RadialProfilerConfig
-from src.trackers.tracker_base import TrackerProtocol
+from src.bead_trackers.bead_tracker.tracker import Tracker
+from src.bead_trackers.bead_tracker.radial_profiler import RadialProfilerConfig
+from src.bead_trackers.tracker_base import TrackerProtocol
 
 from cameras.dhyana2100.camera import Camera, CameraConfig
 from cameras.camera_protocol import CameraFactoryClassRegistry, CameraProtocol

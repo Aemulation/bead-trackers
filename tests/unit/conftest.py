@@ -3,7 +3,7 @@ from typing import cast
 
 import pytest
 
-from src.trackers.bead_tracker.radial_profiler import RadialProfilerConfig
+from src.bead_trackers.bead_tracker.radial_profiler import RadialProfilerConfig
 
 NUM_Z_LAYERS = 11
 NUM_RADIALS = 5

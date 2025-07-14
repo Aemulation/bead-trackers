@@ -1,7 +1,7 @@
 import cupy
 import numpy as np
 
-from src.trackers.bead_tracker.center_of_mass import CenterOfMass
+from src.bead_trackers.bead_tracker.center_of_mass import CenterOfMass
 from tests.unit.conftest import make_roi_coordinates
 
 

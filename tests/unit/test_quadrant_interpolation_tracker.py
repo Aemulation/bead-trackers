@@ -1,7 +1,7 @@
 import cupy
 import numpy as np
 
-from src.trackers.bead_tracker.quadrant_interpolation_tracker import (
+from src.bead_trackers.bead_tracker.quadrant_interpolation_tracker import (
     QuadrantInterpolationTracker,
 )
 

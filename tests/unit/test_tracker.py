@@ -6,11 +6,11 @@ import json
 
 import pathlib
 
-from src.trackers.bead_tracker.quadrant_interpolation_tracker import (
+from src.bead_trackers.bead_tracker.quadrant_interpolation_tracker import (
     QuadrantInterpolationTracker,
 )
-from src.trackers.bead_tracker.tracker import Tracker
-from src.trackers.bead_tracker.radial_profiler import (
+from src.bead_trackers.bead_tracker.tracker import Tracker
+from src.bead_trackers.bead_tracker.radial_profiler import (
     RadialProfiler,
     RadialProfilerConfig,
 )
