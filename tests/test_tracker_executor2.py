@@ -13,13 +13,12 @@ import time
 import threading
 import numpy as np
 
-from src.trackers.tracker_base import (
+from src.bead_trackers.tracker_base import (
     TrackerFactoryClassRegistry,
     TrackerFactoryProtocol,
     TrackerProtocol,
 )
 
-from cameras.dhyana2100.camera import Camera, CameraConfig
 from cameras.camera_protocol import (
     CameraFactoryClassRegistry,
     CameraFactoryProtocol,

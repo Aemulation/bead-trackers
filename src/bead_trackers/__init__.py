@@ -1,1 +1,1 @@
-from .bead_tracker.bead_tracker import TrackerFactory
+from .bead_tracker.tracker import TrackerFactory
