@@ -27,7 +27,6 @@ import time
 NUM_IMAGES = 400
 ROI_SIZE = 60
 
-NUM_RADIAL_STEPS = (ROI_SIZE // 4) - 1
 NUM_ANGLE_STEPS = 131
 
 REFERENCE_BEAD_ID = 96
@@ -35,18 +34,20 @@ REFERENCE_BEAD_ID = 96
 Z_CORRECTION = 0.88
 
 
-# DATA_DIRECTORY = (
-#     "/home/markhonkoop/thesis/RNA67_hairpin_force_extension_save_ROI_tracker"
-# )
 DATA_DIRECTORY = (
-    "C:/data/Misha/20250520/exp1/RNA67_hairpin_force_extension_save_ROI_tracker"
+    "/home/markhonkoop/thesis/RNA67_hairpin_force_extension_save_ROI_tracker"
 )
+# DATA_DIRECTORY = (
+#     "C:/data/Misha/20250520/exp1/RNA67_hairpin_force_extension_save_ROI_tracker"
+# )
 # DATA_DIRECTORY = "C:/data/Luca/20250414/TX_mtRNAP_7pN"
 # DATA_DIRECTORY = "C:/data/Misha/20250520/exp1/RNA67_hairpin_const_forces_save_ROI"
 # DATA_DIRECTORY = "/home/markhonkoop/tmp/RNA67_hairpin_force_extension_save_ROI_tracker"
 
 # BEADS_TO_VISUALIEZ = np.array([0, 11, 20, 31, 40, 50, 54, -1])
 BEADS_TO_VISUALIEZ = np.array([0, 11, 20, 54])
+# BEADS_TO_VISUALIEZ = np.array([0, 1, 2, 3])
+# BEADS_TO_VISUALIEZ = np.array([0, 1, 2, -1])
 # BEADS_TO_VISUALIEZ = np.array([0, 1, 2, 3, 4, 5, 6, 7])
 # BEADS_TO_VISUALIEZ = np.array([8, 9, 10, 11, 12, 13, 14, 15])
 # BEADS_TO_VISUALIEZ = np.array([16, 17, 18, 19, 20, 21, 22, 23])
@@ -181,7 +182,9 @@ def test_tracker_real_lazy(
     traces = cupy.concatenate(traces)
 
     for image_buffer in image_buffer_generator():
+        event = cupy.cuda.Event(block=True)
         tracker.calculate(image_buffer)
+        event.synchronize()
         bead_coordinates = tracker.get_calculated_yx()
         z_values = tracker.get_calculated_z()
 
@@ -399,7 +402,7 @@ def test_tracker_time(
 ):
     images = cupy.repeat(cupy.expand_dims(camera_image, axis=0), NUM_IMAGES, axis=0)
 
-    num_rois = 800
+    num_rois = 500
     height, width = camera_image.shape
     roi_coordinates = make_roi_coordinates(num_rois, height, width, ROI_SIZE)
 
