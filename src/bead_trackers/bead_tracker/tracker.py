@@ -5,7 +5,7 @@ import matplotlib.patches
 import matplotlib.pyplot as plt
 import time
 
-from src.bead_trackers.tracker_base import TrackerProtocol
+from src.bead_trackers import TrackerProtocol
 
 from src.bead_trackers.bead_tracker.z_lookup_tables import ZLookupTables
 from src.bead_trackers.bead_tracker.radial_profiler import (
