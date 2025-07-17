@@ -419,10 +419,10 @@ QI_TRACKER_ARGUMENTS = {
     "roi_coordinates": ROI_COORDINATES,
     "roi_size": ROI_SIZE,
     "zstacks": np.zeros([NUM_ROIS, 100, ROI_SIZE, ROI_SIZE], dtype=cupy.uint16),
-    "number_of_qi_radial_steps": ROI_SIZE // 4,
-    "number_of_qi_angle_steps": 100,
-    "number_of_lut_radial_steps": 100,
-    "number_of_lut_angle_steps": 100,
+    "number_of_qi_radial_steps": (ROI_SIZE // 2 - 1) * 3,
+    "number_of_qi_angle_steps": 131,
+    "number_of_lut_radial_steps": ROI_SIZE // 2,
+    "number_of_lut_angle_steps": 131,
 }
 
 CAMERA_ARGUMENTS = {
