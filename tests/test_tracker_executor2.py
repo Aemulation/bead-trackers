@@ -37,8 +37,7 @@ class TrackerExecutorWorkerCommand(Enum):
 
 class TrackerExecutorControllerCommand(Enum):
     Image = 1
-    ZCoordinates = 2
-    YXCoordinates = 3
+    Coordinates = 2
 
 
 class TrackerExecutorWorker:
@@ -113,6 +112,12 @@ class TrackerExecutorWorker:
         self.__host_z_values_buffer2 = cupyx.zeros_pinned(
             (buffer_size, num_rois), dtype=cupy.float32
         )
+        self.__host_yx_values_buffer1 = cupyx.zeros_pinned(
+            (buffer_size, num_rois, 2), dtype=cupy.float32
+        )
+        self.__host_yx_values_buffer2 = cupyx.zeros_pinned(
+            (buffer_size, num_rois, 2), dtype=cupy.float32
+        )
 
         # Warmup. Compile all Cupy and CUDA code.
         for _ in range(5):
@@ -171,14 +176,8 @@ class TrackerExecutorWorker:
             )
             self.__worker_to_controller_queue.put(
                 (
-                    TrackerExecutorControllerCommand.ZCoordinates,
-                    device_z_values_buffer2,
-                )
-            )
-            self.__worker_to_controller_queue.put(
-                (
-                    TrackerExecutorControllerCommand.YXCoordinates,
-                    device_yx_values_buffer2,
+                    TrackerExecutorControllerCommand.Coordinates,
+                    (self.__host_z_values_buffer2, self.__host_yx_values_buffer2),
                 )
             )
             self.__stream1.wait_event(transfer_coordinates_done_event1)
@@ -203,6 +202,13 @@ class TrackerExecutorWorker:
                     cupy.cuda.runtime.memcpyDeviceToHost,
                     self.__stream1.ptr,
                 )
+                cupy.cuda.runtime.memcpyAsync(
+                    self.__host_yx_values_buffer1.ctypes.data,
+                    device_yx_values_buffer1.data.ptr,
+                    device_yx_values_buffer1.nbytes,
+                    cupy.cuda.runtime.memcpyDeviceToHost,
+                    self.__stream1.ptr,
+                )
                 transfer_coordinates_done_event1.record()
 
             with self.__stream2:
@@ -216,12 +222,9 @@ class TrackerExecutorWorker:
                 (TrackerExecutorControllerCommand.Image, host_images_buffer2[0])
             )
             self.__worker_to_controller_queue.put(
-                (TrackerExecutorControllerCommand.ZCoordinates, device_z_values_buffer1)
-            )
-            self.__worker_to_controller_queue.put(
                 (
-                    TrackerExecutorControllerCommand.YXCoordinates,
-                    device_yx_values_buffer1,
+                    TrackerExecutorControllerCommand.Coordinates,
+                    (self.__host_z_values_buffer1, self.__host_yx_values_buffer1),
                 )
             )
             self.__stream1.wait_event(transfer_coordinates_done_event2)
@@ -243,6 +246,13 @@ class TrackerExecutorWorker:
                     self.__host_z_values_buffer2.ctypes.data,
                     device_z_values_buffer2.data.ptr,
                     device_z_values_buffer2.nbytes,
+                    cupy.cuda.runtime.memcpyDeviceToHost,
+                    self.__stream1.ptr,
+                )
+                cupy.cuda.runtime.memcpyAsync(
+                    self.__host_yx_values_buffer2.ctypes.data,
+                    device_yx_values_buffer2.data.ptr,
+                    device_yx_values_buffer2.nbytes,
                     cupy.cuda.runtime.memcpyDeviceToHost,
                     self.__stream1.ptr,
                 )
@@ -311,8 +321,7 @@ class TrackerExecutorWorker:
 
 class TrackerExecutorController:
     IMAGE_TOPIC = "TrackerExecutorImageTopic"
-    Z_VALUES_TOPIC = "TrackerExecutorZValuesTopic"
-    YX_VALUES_TOPIC = "TrackerExecutorYXValuesTopic"
+    COORDINATES_TOPIC = "TrackerExecutorCoordinatesTopic"
 
     def __init__(
         self,
@@ -360,12 +369,12 @@ class TrackerExecutorController:
             if command == TrackerExecutorControllerCommand.Image:
                 image = cast(np.ndarray, data)
                 pub.sendMessage(self.IMAGE_TOPIC, image=image)
-            elif command == TrackerExecutorControllerCommand.ZCoordinates:
-                image = cast(np.ndarray, data)
-                pub.sendMessage(self.Z_VALUES_TOPIC, image=image)
-            elif command == TrackerExecutorControllerCommand.YXCoordinates:
-                image = cast(np.ndarray, data)
-                pub.sendMessage(self.YX_VALUES_TOPIC, image=image)
+            elif command == TrackerExecutorControllerCommand.Coordinates:
+                z_values = cast(np.ndarray, data[0])
+                yx_values = cast(np.ndarray, data[1])
+                pub.sendMessage(
+                    self.COORDINATES_TOPIC, z_values=z_values, yx_values=yx_values
+                )
             else:
                 print(f"Controller received unsupported command: {command}")
         print("Controller communication is done")
