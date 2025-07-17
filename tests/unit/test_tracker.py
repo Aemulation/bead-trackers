@@ -419,12 +419,12 @@ def test_tracker_time(
         1,
         ROI_SIZE // 2,
         (ROI_SIZE // 2 - 1) * 3,
-        131,
+        150,
         3,
         1,
         ROI_SIZE // 2,
         ROI_SIZE // 2 - 1,
-        131,
+        150,
     )
 
     total_elapsed = 0
