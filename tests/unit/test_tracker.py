@@ -482,8 +482,8 @@ def test_tracker_measure_buffer_size(
 
     min_radius = 1
     max_radius = ROI_SIZE // 2
-    number_of_qi_angle_steps = 200
-    number_of_qi_radial_steps = ROI_SIZE // 2 - 1
+    number_of_qi_angle_steps = 131
+    number_of_qi_radial_steps = (ROI_SIZE // 2 - 1) * 3
     number_of_qi_iterations = 3
 
     pathlib.Path("test-results/buffer-sizes").mkdir(parents=True, exist_ok=True)
@@ -517,7 +517,7 @@ def test_tracker_measure_buffer_size(
                 1,
                 ROI_SIZE // 2,
                 ROI_SIZE // 2 - 1,
-                200,
+                131,
             )
 
             total_elapsed = 0
