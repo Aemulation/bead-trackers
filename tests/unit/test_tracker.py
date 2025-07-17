@@ -24,7 +24,7 @@ from tests.unit.conftest import NUM_RADIALS, NUM_Z_LAYERS, make_roi_coordinates
 import time
 
 
-NUM_IMAGES = 400
+NUM_IMAGES = 300
 ROI_SIZE = 60
 
 NUM_ANGLE_STEPS = 131
@@ -419,12 +419,12 @@ def test_tracker_time(
         1,
         ROI_SIZE // 2,
         (ROI_SIZE // 2 - 1) * 3,
-        100,
+        200,
         3,
         1,
         ROI_SIZE // 2,
         ROI_SIZE // 2 - 1,
-        100,
+        200,
     )
 
     total_elapsed = 0

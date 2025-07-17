@@ -1,1 +1,1 @@
-from bead_trackers.bead_tracker.tracker import TrackerFactoryClassRegistry
+from src.bead_trackers.bead_tracker.tracker import TrackerFactoryClassRegistry

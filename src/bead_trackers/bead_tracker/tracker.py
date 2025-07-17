@@ -5,19 +5,19 @@ import matplotlib.patches
 import matplotlib.pyplot as plt
 import time
 
-from bead_trackers.tracker_base import TrackerProtocol
+from src.bead_trackers.tracker_base import TrackerProtocol
 
-from bead_trackers.bead_tracker.z_lookup_tables import ZLookupTables
-from bead_trackers.bead_tracker.radial_profiler import (
+from src.bead_trackers.bead_tracker.z_lookup_tables import ZLookupTables
+from src.bead_trackers.bead_tracker.radial_profiler import (
     RadialProfiler,
     RadialProfilerConfig,
 )
-from bead_trackers.bead_tracker.center_of_mass import CenterOfMass
-from bead_trackers.bead_tracker.quadrant_interpolation_tracker import (
+from src.bead_trackers.bead_tracker.center_of_mass import CenterOfMass
+from src.bead_trackers.bead_tracker.quadrant_interpolation_tracker import (
     QuadrantInterpolationTracker,
 )
 
-from bead_trackers.tracker_base import (
+from src.bead_trackers.tracker_base import (
     TrackerFactoryProtocol,
     TrackerFactoryClassRegistry,
 )
