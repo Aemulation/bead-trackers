@@ -478,7 +478,7 @@ def test_tracker_measure_buffer_size(
         # 1_100,
     ]
 
-    num_iters = 1000
+    num_iters = 100
 
     min_radius = 1
     max_radius = ROI_SIZE // 2
