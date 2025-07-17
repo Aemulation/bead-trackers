@@ -387,15 +387,29 @@ class TrackerExecutorController:
         self.__communication_thread.join()
 
 
-NUM_ROIS = 10
-ROI_COORDINATES = cupy.array([[0, 0]] * NUM_ROIS, dtype=cupy.uint32)
-ROI_SIZE = 100
+def make_roi_coordinates(
+    num_rois: int, image_height: int, image_width: int, roi_size: int
+) -> np.ndarray:
+    random_y = cupy.random.randint(
+        0, image_height - roi_size, num_rois, dtype=cupy.uint32
+    )
+    random_x = cupy.random.randint(
+        0, image_width - roi_size, num_rois, dtype=cupy.uint32
+    )
+
+    return np.sort(np.column_stack((random_y, random_x)))
+
+
+NUM_ROIS = 500
+# ROI_COORDINATES = cupy.array([[0, 0]] * NUM_ROIS, dtype=cupy.uint32)
+ROI_SIZE = 60
+ROI_COORDINATES = make_roi_coordinates(NUM_ROIS, 2016, 2560, ROI_SIZE)
 
 QI_TRACKER_ARGUMENTS = {
     "num_images_per_buffer": BUFFER_SIZE,
     "roi_coordinates": ROI_COORDINATES,
     "roi_size": ROI_SIZE,
-    "zstacks": cupy.zeros([NUM_ROIS, 20, ROI_SIZE, ROI_SIZE], dtype=cupy.uint16),
+    "zstacks": np.zeros([NUM_ROIS, 100, ROI_SIZE, ROI_SIZE], dtype=cupy.uint16),
     "number_of_qi_radial_steps": ROI_SIZE // 4,
     "number_of_qi_angle_steps": 100,
     "number_of_lut_radial_steps": 100,
