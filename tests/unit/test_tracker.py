@@ -556,10 +556,10 @@ def test_tracker_measure_buffer_size(
             [f"{key}={value}" for key, value in data["parameters"].items()]
         )
 
-        # with open(f"test-results/buffer-sizes/{file_name}.json", "w") as file:
-        #     json.dump(data, file)
-        with open(f"test-results/block-sizes/{file_name}.json", "w") as file:
+        with open(f"test-results/buffer-sizes/{file_name}.json", "w") as file:
             json.dump(data, file)
+        # with open(f"test-results/block-sizes/{file_name}.json", "w") as file:
+        #     json.dump(data, file)
 
 
 def test_tracker_measure_transfer_time(
