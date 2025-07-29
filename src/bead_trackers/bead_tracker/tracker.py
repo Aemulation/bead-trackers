@@ -207,11 +207,11 @@ class Tracker(TrackerProtocol):
 
         z_lookup_tables = cupy.array(z_lookup_tables)
 
-        plt.imshow(z_lookup_tables[0])
+        plt.imshow(z_lookup_tables[0].get())
         plt.show()
-        plt.imshow(z_lookup_tables[1])
+        plt.imshow(z_lookup_tables[1].get())
         plt.show()
-        plt.imshow(z_lookup_tables[2])
+        plt.imshow(z_lookup_tables[2].get())
         plt.show()
 
         return z_lookup_tables.astype(cupy.float32)
