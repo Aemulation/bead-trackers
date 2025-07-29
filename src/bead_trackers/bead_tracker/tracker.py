@@ -52,8 +52,8 @@ class TrackerFactory(TrackerFactoryProtocol):
         self.__number_of_qi_angle_steps = number_of_qi_angle_steps
         self.__number_of_lut_radial_steps = number_of_lut_radial_steps
         self.__number_of_lut_angle_steps = number_of_lut_angle_steps
-        self.__max_lut_radius = max_lut_radius or roi_size / 4
-        self.__max_qi_radius = max_qi_radius or roi_size / 4
+        self.__max_lut_radius = max_lut_radius or roi_size / 2
+        self.__max_qi_radius = max_qi_radius or roi_size / 2
         self.__number_of_qi_iterations = number_of_qi_iterations
         self.__min_lut_radius = min_lut_radius
         self.__min_qi_radius = min_qi_radius
