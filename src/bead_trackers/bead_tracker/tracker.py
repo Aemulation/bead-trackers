@@ -1,9 +1,6 @@
-from abc import abstractmethod
 import cupy
 import numpy as np
-import matplotlib.patches
 import matplotlib.pyplot as plt
-import time
 
 from bead_trackers.tracker_base import TrackerProtocol
 
@@ -209,6 +206,13 @@ class Tracker(TrackerProtocol):
             z_lookup_tables.append(z_lookup_table)
 
         z_lookup_tables = cupy.array(z_lookup_tables)
+
+        plt.imshow(z_lookup_tables[0])
+        plt.show()
+        plt.imshow(z_lookup_tables[1])
+        plt.show()
+        plt.imshow(z_lookup_tables[2])
+        plt.show()
 
         return z_lookup_tables.astype(cupy.float32)
 
