@@ -1,7 +1,7 @@
 import os
 import cupy
 
-from bead_trackers.bead_tracker.quadratic_polynomial_fitter import (
+from bead_trackers.qi_tracker.quadratic_polynomial_fitter import (
     QuadraticPolynomialFitter,
 )
 
