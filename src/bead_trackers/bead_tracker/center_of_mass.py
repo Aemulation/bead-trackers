@@ -61,7 +61,6 @@ class CenterOfMass:
         roi_coordinates: cupy.ndarray,
     ) -> cupy.ndarray:
         assert roi_coordinates.dtype == cupy.uint32
-        assert images.dtype == cupy.uint16
         if images.dtype == cupy.uint8:
             calculate_averages_kernel = self.__cuda_modules.calculate_averages_8bit()
         elif images.dtype == cupy.uint16:
