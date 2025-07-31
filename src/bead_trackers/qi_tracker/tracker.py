@@ -4,13 +4,13 @@ import matplotlib.pyplot as plt
 
 from bead_trackers.tracker_base import TrackerProtocol
 
-from bead_trackers.bead_tracker.z_lookup_tables import ZLookupTables
-from bead_trackers.bead_tracker.radial_profiler import (
+from bead_trackers.qi_tracker.z_lookup_tables import ZLookupTables
+from bead_trackers.qi_tracker.radial_profiler import (
     RadialProfiler,
     RadialProfilerConfig,
 )
-from bead_trackers.bead_tracker.center_of_mass import CenterOfMass
-from bead_trackers.bead_tracker.quadrant_interpolation_tracker import (
+from bead_trackers.qi_tracker.center_of_mass import CenterOfMass
+from bead_trackers.qi_tracker.quadrant_interpolation_tracker import (
     QuadrantInterpolationTracker,
 )
 
